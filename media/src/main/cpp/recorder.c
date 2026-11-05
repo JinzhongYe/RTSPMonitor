@@ -31,6 +31,8 @@ JNIEXPORT jint JNICALL Java_com_rtspmonitor_media_AvRecorder_run(JNIEnv *env,job
  AVFormatContext *in=avformat_alloc_context(), *out=NULL;
  AVPacket *pkt=av_packet_alloc(); AVDictionary *opts=NULL;
  int result=-1, video=-1, audio=-1, map[2], seq=0, warned=0, output_error=0; int64_t wait_start=av_gettime_relative(); int64_t start=AV_NOPTS_VALUE, last[2]={AV_NOPTS_VALUE,AV_NOPTS_VALUE};
+ int64_t first_wall=0, frame_end=0;
+ char timing[128];
  char path[4096]={0}, final[4096]={0};
  av_log_set_level(AV_LOG_QUIET); // Native diagnostics may contain RTSP credentials.
  ctl->deadline=av_gettime_relative()+15000000;
@@ -67,6 +69,7 @@ JNIEXPORT jint JNICALL Java_com_rtspmonitor_media_AvRecorder_run(JNIEnv *env,job
   }
   if(!out) {
    if(!key) { if(!warned && av_gettime_relative()-wait_start>30000000) { event(env,cb,"warning","等待视频关键帧超过30秒，请检查摄像头GOP设置"); warned=1; } av_packet_unref(pkt); continue; }
+   first_wall=av_gettime()/1000; frame_end=0;
    start=dts; last[0]=last[1]=AV_NOPTS_VALUE;
    snprintf(path,sizeof(path),"%s/%06d.part",dir,seq);
    snprintf(final,sizeof(final),"%s/%06d.mp4",dir,seq++);
@@ -81,7 +84,7 @@ JNIEXPORT jint JNICALL Java_com_rtspmonitor_media_AvRecorder_run(JNIEnv *env,job
    result=avio_open(&out->pb,path,AVIO_FLAG_WRITE); if(result<0) { output_error=1; goto done; }
    av_dict_set(&opts,"movflags","+frag_keyframe+empty_moov+default_base_moof",0);
    result=avformat_write_header(out,&opts); av_dict_free(&opts); if(result<0) { output_error=1; goto done; }
-   event(env,cb,"recording","");
+   event(env,cb,"recording",path);
   }
   AVStream *src=in->streams[pkt->stream_index], *dst=out->streams[index];
   int64_t offset=av_rescale_q(start,AV_TIME_BASE_Q,src->time_base);
@@ -90,7 +93,13 @@ JNIEXPORT jint JNICALL Java_com_rtspmonitor_media_AvRecorder_run(JNIEnv *env,job
   av_packet_rescale_ts(pkt,src->time_base,dst->time_base); pkt->stream_index=index; pkt->pos=-1;
   if(last[index]!=AV_NOPTS_VALUE && pkt->dts<=last[index]) { result=AVERROR_INVALIDDATA; break; }
   last[index]=pkt->dts;
+  int64_t end_ms=index==0 ? av_rescale_q(pkt->pts+pkt->duration,dst->time_base,(AVRational){1,1000}) : 0;
   result=av_interleaved_write_frame(out,pkt); av_packet_unref(pkt); if(result<0) { output_error=1; break; }
+  if(index==0) {
+   if(end_ms>frame_end) frame_end=end_ms;
+   snprintf(timing,sizeof(timing),"%lld,%lld",(long long)first_wall,(long long)(first_wall+frame_end));
+   event(env,cb,"frame-time",timing);
+  }
  }
  if(out) {
   int r=finish(&out);

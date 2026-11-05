@@ -1,0 +1,35 @@
+{
+  "version": "0.6.0",
+  "versionCode": 6,
+  "apkSha256": "19e1aa357e59178b4881af11b6e944d9d7d14850ad36d56f699c7f77117be6d4",
+  "runtime": "Android 15 API35 arm64 emulator",
+  "JVM": {
+    "passed": 22,
+    "failed": 0
+  },
+  "data": {
+    "passed": 6,
+    "failed": 0
+  },
+  "isolationClass": {
+    "passed": 1,
+    "skipped": 1
+  },
+  "recreation": {
+    "passed": 1
+  },
+  "nativeRecording": {
+    "passed": 4
+  },
+  "publishExport": {
+    "passed": 3
+  },
+  "recoveryAndWriteFailure": {
+    "passed": 3
+  },
+  "activityNotificationsEndToEnd": "BLOCKED: MediaPipe RDSVL SIGILL on this emulator; attempted crash evidence retained",
+  "physicalCameraTested": false,
+  "apkSignatureVerified": true,
+  "recordingServiceRunningAfterTests": false,
+  "publishedToGitHubAtValidation": false
+}

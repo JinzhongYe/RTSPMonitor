@@ -27,12 +27,13 @@ import java.util.UUID
   app.store.publish(input,Camera(id,"Playback-Rotation","not-used"))
   val item=app.database.dao().recordings().first().single { it.cameraId==id }
   try {
-   ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-    lateinit var vm: MonitorViewModel
-    scenario.onActivity { activity -> vm=ViewModelProvider(activity)[MonitorViewModel::class.java]; vm.playRecording(item.uri) }
-    withTimeout(20_000) { while(vm.localPlayer.status.value.state!=ConnectionState.CONNECTED || !vm.localPlayer.status.value.info.contains("320 × 240")) delay(100) }
+   ActivityScenario.launch<PlaybackActivity>(android.content.Intent(app,PlaybackActivity::class.java).putExtra("uri",item.uri)).use { scenario ->
+    lateinit var vm: PlaybackViewModel
+    scenario.onActivity { activity -> vm=ViewModelProvider(activity)[PlaybackViewModel::class.java] }
+    withTimeout(20_000) { while(!vm.player.playback.value.seekable) delay(100) }
+    scenario.onActivity { vm.player.speedPlayback(1.5f);vm.player.seekPlayback(1000) }
     scenario.recreate()
-    scenario.onActivity { activity -> assertSame(vm,ViewModelProvider(activity)[MonitorViewModel::class.java]); assertEquals(item.uri,vm.localUri) }
+    scenario.onActivity { activity -> assertSame(vm,ViewModelProvider(activity)[PlaybackViewModel::class.java]); assertEquals(item.uri,vm.uri);vm.player.refreshPlayback();assertEquals(1.5f,vm.player.playback.value.speed,0.01f) }
     delay(1_500)
     val bitmap=Bitmap.createBitmap(32,24,Bitmap.Config.ARGB_8888)
     val result=CompletableDeferred<Int>()

@@ -24,6 +24,9 @@ import java.util.UUID
   val store=VideoStore(context,db.dao())
   val input=File(store.temporary,"${UUID.randomUUID()}.part")
   source.copyTo(input)
+  val start=java.time.Instant.parse("2026-11-05T02:30:00Z").toEpochMilli()
+  val sidecar=File(input.parentFile,input.nameWithoutExtension+".meta")
+  sidecar.writeText(org.json.JSONObject().put("startedAt",start).put("endedAt",start+60000).put("offsetMinutes",480).put("sources",2).toString())
   input.appendBytes(ByteBuffer.allocate(32).putInt(8).put("moof".toByteArray()).putInt(100000).put("mdat".toByteArray()).array())
   var published: Recording?=null
   try {
@@ -40,6 +43,9 @@ import java.util.UUID
    store.publish(input,Camera("recovery","Recovery","not-used"))
    published=db.dao().recordings().first().single()
    assertFalse(input.exists())
+   assertEquals(2,published!!.sourceMask)
+   assertTrue(published!!.endedAt!! in start+5900..start+6100)
+   assertTrue(published!!.name.endsWith("_活动.mp4"))
   } finally { published?.let { store.delete(it) }; input.delete(); db.close() }
  }
  @Test fun unrecoverableHeaderIsRetained() {

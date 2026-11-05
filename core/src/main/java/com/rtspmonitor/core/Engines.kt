@@ -32,3 +32,5 @@ data class SessionStatus(
     val lastError: String? = null
 )
 fun safeCameraName(name: String): String = name.replace(Regex("[^\\p{L}\\p{N}_-]"), "_").take(60).ifBlank { "Camera" }
+
+data class PlaybackStatus(val positionMs:Long=0,val durationMs:Long=0,val speed:Float=1f,val playing:Boolean=false,val seekable:Boolean=false,val error:String?=null)

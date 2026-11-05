@@ -1,0 +1,8 @@
+
+com.rtspmonitor.app.PlaybackIsolationTest:.
+
+Time: 9.068
+
+OK (2 tests)
+
+

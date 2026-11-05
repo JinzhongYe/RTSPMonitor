@@ -30,17 +30,18 @@ class RecordingForegroundService: Service() {
   manager.createNotificationChannel(NotificationChannel("recording","后台监控状态",NotificationManager.IMPORTANCE_LOW))
   manager.createNotificationChannel(NotificationChannel("activity","活动提醒",NotificationManager.IMPORTANCE_HIGH))
  }
- private fun notification(text:String,alarm:Boolean=false):Notification {
+ private fun notification(text:String,alarm:Boolean=false,title:String="录像状态"):Notification {
   val open=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
   val builder=Notification.Builder(this,if(alarm) "activity" else "recording").setSmallIcon(android.R.drawable.presence_video_online)
-   .setContentTitle(if(alarm) "摄像头活动与录像" else "RTSP Monitor").setContentText(text).setContentIntent(open).setOnlyAlertOnce(true)
+   .setContentTitle(if(alarm) title else "RTSP Monitor").setContentText(text).setContentIntent(open).setOnlyAlertOnce(true)
   if(!alarm) {
    val stop=PendingIntent.getService(this,1,Intent(this,javaClass).setAction("STOP_ALL"),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
    builder.setOngoing(true).addAction(Notification.Action.Builder(null,"停止所有任务",stop).build())
   } else builder.setAutoCancel(true)
   return builder.build()
  }
- private fun notifyEvent(text:String) { getSystemService(NotificationManager::class.java).notify(eventId,notification(text,true)) }
+ private fun notifyEvent(text:String) { getSystemService(NotificationManager::class.java).notify(2,notification(text,true)) }
+ private fun notifyActivity(text:String) { getSystemService(NotificationManager::class.java).notify(eventId,notification(text,true,"摄像头活动提醒")) }
  override fun onStartCommand(intent:Intent?,flags:Int,startId:Int):Int {
   startForeground(1,notification("恢复监控任务"),ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
   intent?.getStringExtra("id")?.let { prefs.edit().putString("active_camera",it).apply() }
@@ -79,7 +80,7 @@ class RecordingForegroundService: Service() {
          app.sessions.detectionStatus.value=if(result.first) "检测到人形" else if(result.second) "检测到画面变化" else "未检测到活动"
          val before=policy.active
          policy.sample(result.first,result.second,now)
-         if(!before && policy.active) { eventId=prefs.getInt("event_notification",100)+1;prefs.edit().putInt("event_notification",eventId).apply();attempted=false;notifyEvent("正在准备自动录像") }
+         if(!before && policy.active) { eventId=prefs.getInt("event_notification",100)+1;prefs.edit().putInt("event_notification",eventId).apply();attempted=false;notifyActivity("${camera.name} · ${if(result.first) "检测到人形" else "检测到画面变化"} · ${java.text.DateFormat.getTimeInstance().format(java.util.Date())}") }
         }
        } catch(e:Exception) { if(e is CancellationException)throw e;android.util.Log.e("ActivityDetection","Frame processing failed",e);set("auto",false);policy.reset();app.sessions.message.value="检测失败，自动监控已关闭" }
        finally { bitmap.recycle();detecting.set(false) }
@@ -96,6 +97,7 @@ class RecordingForegroundService: Service() {
      app.sessions.connect(camera);retryAt=now+minOf(30000L,1000L shl minOf(retry++,5))
     } else if(connection==ConnectionState.CONNECTED) { retry=0;retryAt=0 }
     if(!desiredLive && connection!=ConnectionState.DISCONNECTED) app.sessions.disconnect(id)
+    session.sources=(if(flag("manual")) SOURCE_MANUAL else 0) or (if(policy.active) SOURCE_ACTIVITY else 0)
     val desiredRecord=flag("manual") || policy.active
     if(desiredRecord && !attempted) { attempted=true;app.sessions.start(camera) }
     if(!desiredRecord) {

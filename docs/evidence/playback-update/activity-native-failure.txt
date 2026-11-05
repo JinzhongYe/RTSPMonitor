@@ -1,0 +1,297 @@
+[=========                              ] 25%                                   > Task :core:preBuild UP-TO-DATE
+> Task :core:preDebugBuild UP-TO-DATE
+> Task :core:generateDebugResources UP-TO-DATE
+> Task :core:packageDebugResources UP-TO-DATE
+> Task :core:processDebugNavigationResources UP-TO-DATE
+> Task :core:parseDebugLocalResources UP-TO-DATE
+> Task :core:generateDebugRFile UP-TO-DATE
+> Task :core:compileDebugKotlin UP-TO-DATE
+> Task :core:javaPreCompileDebug UP-TO-DATE
+> Task :core:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:preBuild UP-TO-DATE
+> Task :data:preDebugBuild UP-TO-DATE
+> Task :data:generateDebugResources UP-TO-DATE
+> Task :data:packageDebugResources UP-TO-DATE
+> Task :data:processDebugNavigationResources UP-TO-DATE
+> Task :data:parseDebugLocalResources UP-TO-DATE
+> Task :data:generateDebugRFile UP-TO-DATE
+> Task :data:kaptGenerateStubsDebugKotlin UP-TO-DATE
+> Task :data:kaptDebugKotlin UP-TO-DATE
+> Task :data:compileDebugKotlin UP-TO-DATE
+> Task :data:javaPreCompileDebug UP-TO-DATE
+> Task :data:compileDebugJavaWithJavac UP-TO-DATE
+> Task :data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :media:buildNative UP-TO-DATE
+> Task :media:preBuild UP-TO-DATE
+> Task :media:preDebugBuild UP-TO-DATE
+> Task :media:generateDebugResources UP-TO-DATE
+> Task :media:packageDebugResources UP-TO-DATE
+> Task :media:processDebugNavigationResources UP-TO-DATE
+> Task :media:parseDebugLocalResources UP-TO-DATE
+> Task :media:generateDebugRFile UP-TO-DATE
+> Task :media:javaPreCompileDebug UP-TO-DATE
+> Task :media:preDebugAndroidTestBuild UP-TO-DATE
+> Task :media:generateDebugAndroidTestResources UP-TO-DATE
+> Task :media:packageDebugAndroidTestResources UP-TO-DATE
+> Task :media:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :media:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :media:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :media:javaPreCompileDebugAndroidTest UP-TO-DATE
+> Task :core:generateDebugAssets UP-TO-DATE
+> Task :core:mergeDebugAssets UP-TO-DATE
+> Task :data:generateDebugAssets UP-TO-DATE
+> Task :data:mergeDebugAssets UP-TO-DATE
+> Task :media:generateDebugAndroidTestAssets UP-TO-DATE
+> Task :media:generateDebugAssets UP-TO-DATE
+> Task :media:mergeDebugAssets UP-TO-DATE
+> Task :media:mergeDebugAndroidTestAssets UP-TO-DATE
+> Task :media:compressDebugAndroidTestAssets UP-TO-DATE
+> Task :data:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :media:desugarDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :core:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:compileDebugLibraryResources UP-TO-DATE
+> Task :data:mapDebugSourceSetPaths UP-TO-DATE
+> Task :data:compileDebugLibraryResources UP-TO-DATE
+> Task :core:writeDebugAarMetadata UP-TO-DATE
+> Task :data:writeDebugAarMetadata UP-TO-DATE
+> Task :media:writeDebugAarMetadata UP-TO-DATE
+> Task :media:checkDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :media:mapDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :media:compileDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :media:mapDebugSourceSetPaths UP-TO-DATE
+> Task :media:compileDebugLibraryResources UP-TO-DATE
+> Task :media:mergeDebugAndroidTestResources UP-TO-DATE
+> Task :core:extractDeepLinksDebug UP-TO-DATE
+> Task :core:processDebugManifest UP-TO-DATE
+> Task :data:extractDeepLinksDebug UP-TO-DATE
+> Task :data:processDebugManifest UP-TO-DATE
+> Task :media:extractDeepLinksDebug UP-TO-DATE
+> Task :media:processDebugManifest UP-TO-DATE
+> Task :media:processDebugAndroidTestManifest UP-TO-DATE
+> Task :media:processDebugAndroidTestResources UP-TO-DATE
+> Task :core:processDebugJavaRes UP-TO-DATE
+> Task :data:processDebugJavaRes UP-TO-DATE
+> Task :media:checkDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :media:mergeExtDexDebugAndroidTest UP-TO-DATE
+> Task :data:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:mergeDebugNativeLibs NO-SOURCE
+> Task :core:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :data:mergeDebugJniLibFolders UP-TO-DATE
+> Task :data:mergeDebugNativeLibs NO-SOURCE
+> Task :data:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :media:mergeDebugJniLibFolders UP-TO-DATE
+> Task :media:mergeDebugNativeLibs UP-TO-DATE
+> Task :media:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :media:mergeDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :media:mergeDebugAndroidTestNativeLibs UP-TO-DATE
+> Task :media:stripDebugAndroidTestDebugSymbols UP-TO-DATE
+> Task :media:validateSigningDebugAndroidTest UP-TO-DATE
+> Task :media:writeDebugAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :media:compileDebugKotlin
+> Task :media:compileDebugJavaWithJavac NO-SOURCE
+> Task :media:processDebugJavaRes UP-TO-DATE
+> Task :media:bundleLibCompileToJarDebug
+> Task :media:bundleLibRuntimeToJarDebug
+> Task :media:bundleLibRuntimeToDirDebug
+> Task :media:mergeLibDexDebugAndroidTest
+> Task :media:compileDebugAndroidTestKotlin
+> Task :media:compileDebugAndroidTestJavaWithJavac NO-SOURCE
+> Task :media:dexBuilderDebugAndroidTest UP-TO-DATE
+> Task :media:mergeDebugAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :media:processDebugAndroidTestJavaRes UP-TO-DATE
+> Task :media:mergeDebugAndroidTestJavaResource UP-TO-DATE
+> Task :media:mergeProjectDexDebugAndroidTest UP-TO-DATE
+> Task :media:packageDebugAndroidTest
+> Task :media:createDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :media:assembleDebugAndroidTest
+
+BUILD SUCCESSFUL in 1s
+93 actionable tasks: 7 executed, 86 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.1/userguide/configuration_cache_enabling.html
+Performing Streamed Install
+Success
+
+com.rtspmonitor.media.FixtureTest:..
+
+Time: 0.607
+
+OK (2 tests)
+
+
+/sdcard/Android/data/com.rtspmonitor.media.test/files/fixtures/./: 2 files pulled, 0 skipped. 20.3 MB/s (67892 bytes in 0.003s)
+
+com.rtspmonitor.media.MediaStoreVideoTest:...
+
+Time: 0.265
+
+OK (3 tests)
+
+
+[=========                              ] 25%                                   > Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :core:preBuild UP-TO-DATE
+> Task :core:preDebugBuild UP-TO-DATE
+> Task :core:processDebugNavigationResources UP-TO-DATE
+> Task :data:preBuild UP-TO-DATE
+> Task :data:preDebugBuild UP-TO-DATE
+> Task :data:processDebugNavigationResources UP-TO-DATE
+> Task :media:buildNative UP-TO-DATE
+> Task :media:preBuild UP-TO-DATE
+> Task :media:preDebugBuild UP-TO-DATE
+> Task :media:processDebugNavigationResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:generateDebugRFile UP-TO-DATE
+> Task :core:generateDebugResources UP-TO-DATE
+> Task :core:packageDebugResources UP-TO-DATE
+> Task :core:parseDebugLocalResources UP-TO-DATE
+> Task :core:generateDebugRFile UP-TO-DATE
+> Task :core:compileDebugKotlin UP-TO-DATE
+> Task :core:javaPreCompileDebug UP-TO-DATE
+> Task :core:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:generateDebugResources UP-TO-DATE
+> Task :data:packageDebugResources UP-TO-DATE
+> Task :data:parseDebugLocalResources UP-TO-DATE
+> Task :data:generateDebugRFile UP-TO-DATE
+> Task :data:kaptGenerateStubsDebugKotlin UP-TO-DATE
+> Task :data:kaptDebugKotlin UP-TO-DATE
+> Task :data:compileDebugKotlin UP-TO-DATE
+> Task :data:javaPreCompileDebug UP-TO-DATE
+> Task :data:compileDebugJavaWithJavac UP-TO-DATE
+> Task :data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :media:generateDebugResources UP-TO-DATE
+> Task :media:packageDebugResources UP-TO-DATE
+> Task :media:parseDebugLocalResources UP-TO-DATE
+> Task :media:generateDebugRFile UP-TO-DATE
+> Task :media:compileDebugKotlin UP-TO-DATE
+> Task :media:javaPreCompileDebug UP-TO-DATE
+> Task :media:compileDebugJavaWithJavac NO-SOURCE
+> Task :media:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :core:generateDebugAssets UP-TO-DATE
+> Task :core:mergeDebugAssets UP-TO-DATE
+> Task :data:generateDebugAssets UP-TO-DATE
+> Task :data:mergeDebugAssets UP-TO-DATE
+> Task :media:generateDebugAssets UP-TO-DATE
+> Task :media:mergeDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :data:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :media:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :core:writeDebugAarMetadata UP-TO-DATE
+> Task :data:writeDebugAarMetadata UP-TO-DATE
+> Task :media:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :core:extractDeepLinksDebug UP-TO-DATE
+> Task :core:processDebugManifest UP-TO-DATE
+> Task :data:extractDeepLinksDebug UP-TO-DATE
+> Task :data:processDebugManifest UP-TO-DATE
+> Task :media:extractDeepLinksDebug UP-TO-DATE
+> Task :media:processDebugManifest UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :core:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:compileDebugLibraryResources UP-TO-DATE
+> Task :data:mapDebugSourceSetPaths UP-TO-DATE
+> Task :data:compileDebugLibraryResources UP-TO-DATE
+> Task :media:mapDebugSourceSetPaths UP-TO-DATE
+> Task :media:compileDebugLibraryResources UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :core:processDebugJavaRes UP-TO-DATE
+> Task :data:processDebugJavaRes UP-TO-DATE
+> Task :media:processDebugJavaRes UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :data:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :media:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:mergeDebugNativeLibs NO-SOURCE
+> Task :core:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :data:mergeDebugJniLibFolders UP-TO-DATE
+> Task :data:mergeDebugNativeLibs NO-SOURCE
+> Task :data:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :media:mergeDebugJniLibFolders UP-TO-DATE
+> Task :media:mergeDebugNativeLibs UP-TO-DATE
+> Task :media:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:generateDebugAndroidTestResources UP-TO-DATE
+> Task :app:packageDebugAndroidTestResources UP-TO-DATE
+> Task :app:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :app:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :app:javaPreCompileDebugAndroidTest UP-TO-DATE
+> Task :app:generateDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergeLibDexDebug
+> Task :app:mergeDebugAndroidTestAssets UP-TO-DATE
+> Task :app:compressDebugAndroidTestAssets UP-TO-DATE
+> Task :app:desugarDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :app:checkDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :app:mapDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :app:compileDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :app:mergeDebugAndroidTestResources UP-TO-DATE
+> Task :app:processDebugAndroidTestManifest UP-TO-DATE
+> Task :app:processDebugAndroidTestResources UP-TO-DATE
+> Task :app:checkDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebugAndroidTest UP-TO-DATE
+> Task :app:mergeLibDexDebugAndroidTest UP-TO-DATE
+> Task :app:mergeDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebugAndroidTest UP-TO-DATE
+> Task :app:writeDebugAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :app:compileDebugKotlin
+> Task :app:compileDebugJavaWithJavac NO-SOURCE
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:mergeProjectDexDebug
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug
+> Task :app:compileDebugAndroidTestKotlin
+> Task :app:compileDebugAndroidTestJavaWithJavac NO-SOURCE
+> Task :app:dexBuilderDebugAndroidTest
+> Task :app:processDebugAndroidTestJavaRes UP-TO-DATE
+> Task :app:mergeDebugAndroidTestJavaResource UP-TO-DATE
+> Task :app:mergeDebugAndroidTestGlobalSynthetics
+> Task :app:mergeProjectDexDebugAndroidTest
+> Task :app:packageDebugAndroidTest
+> Task :app:createDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebugAndroidTest
+
+BUILD SUCCESSFUL in 2s
+128 actionable tasks: 11 executed, 117 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.1/userguide/configuration_cache_enabling.html
+Performing Streamed Install
+Success
+Performing Streamed Install
+Success
+
+com.rtspmonitor.app.PlaybackIsolationTest:.INSTRUMENTATION_RESULT: shortMsg=Process crashed.
+INSTRUMENTATION_CODE: 0

@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 : "${MEDIAMTX_BIN:?Set MEDIAMTX_BIN to the MediaMTX executable}"
 : "${FFMPEG_BIN:?Set FFMPEG_BIN to a FFmpeg executable with RTSP/MP4/WAV support}"
 rtsp_mode="${1:-record}"
-case "$rtsp_mode" in record|udp|udp-forwarded|playback|audio|recovery|background|notifications-denied|resilience|long|vlc) ;; *) echo "Unknown test mode" >&2; exit 2;; esac
+case "$rtsp_mode" in record|udp|udp-forwarded|playback|audio|recovery|background|playback-isolation|notifications-denied|resilience|long|vlc) ;; *) echo "Unknown test mode" >&2; exit 2;; esac
 rtsp_sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Library/Android/sdk}}"
 rtsp_adb="$rtsp_sdk/platform-tools/adb"
 rtsp_serial="${ANDROID_SERIAL:-emulator-5554}"
@@ -20,8 +20,8 @@ cleanup() {
   "$rtsp_adb" -s "$rtsp_serial" shell pm grant com.rtspmonitor.app android.permission.POST_NOTIFICATIONS || true
  fi
  "$rtsp_adb" -s "$rtsp_serial" pull /sdcard/Android/data/com.rtspmonitor.media.test/files/spike-results "$rtsp_result/" >/dev/null 2>&1 || true
- for rtsp_pid in "${rtsp_pids[@]}"; do kill "$rtsp_pid" 2>/dev/null || true; done
- for rtsp_pid in "${rtsp_pids[@]}"; do wait "$rtsp_pid" 2>/dev/null || true; done
+ for rtsp_pid in "${rtsp_pids[@]+${rtsp_pids[@]}}"; do kill "$rtsp_pid" 2>/dev/null || true; done
+ for rtsp_pid in "${rtsp_pids[@]+${rtsp_pids[@]}}"; do wait "$rtsp_pid" 2>/dev/null || true; done
 }
 trap cleanup EXIT
 trap 'exit 130' INT
@@ -71,7 +71,7 @@ done
 sleep 1
 case "$rtsp_mode" in
  record)
-  run_test 'com.rtspmonitor.media.RtspRecordingTest#h264Tcp,com.rtspmonitor.media.RtspRecordingTest#h265Tcp,com.rtspmonitor.media.RtspRecordingTest#twoRecordersRemainIndependentWhenOneStops' recording.log -e rtspBase rtsp://10.0.2.2:18554 ;;
+  run_test 'com.rtspmonitor.media.RtspRecordingTest#h264Tcp,com.rtspmonitor.media.RtspRecordingTest#h265Tcp,com.rtspmonitor.media.RtspRecordingTest#twoRecordersRemainIndependentWhenOneStops,com.rtspmonitor.media.RtspRecordingTest#sourceChangesAreUnionedWithinOneSegment' recording.log -e rtspBase rtsp://10.0.2.2:18554 ;;
  udp)
   run_test 'com.rtspmonitor.media.RtspRecordingTest#h264Udp,com.rtspmonitor.media.RtspRecordingTest#h265Udp' udp.log -e rtspBase rtsp://10.0.2.2:18554 ;;
  udp-forwarded|playback)
@@ -102,7 +102,7 @@ WAV
   run_test 'com.rtspmonitor.media.RecoveryTest,com.rtspmonitor.media.WriteFailureTest' recovery.log -e useFixtures true -e rtspBase rtsp://10.0.2.2:18554 ;;
  vlc)
   run_test com.rtspmonitor.media.VlcProbeTest vlc.log -e rtspBase rtsp://10.0.2.2:18554 -e rtspApi http://10.0.2.2:19997 ;;
- background|notifications-denied|resilience|long)
+ background|playback-isolation|notifications-denied|resilience|long)
   ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
   "$rtsp_adb" -s "$rtsp_serial" install -r app/build/outputs/apk/debug/app-debug.apk
   "$rtsp_adb" -s "$rtsp_serial" install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
@@ -112,6 +112,7 @@ WAV
   fi
   rtsp_runner=com.rtspmonitor.app.test
   case "$rtsp_mode" in
+   playback-isolation) run_test com.rtspmonitor.app.PlaybackIsolationTest playback-isolation.log -e rtspBase rtsp://10.0.2.2:18554 ;;
    background) run_test com.rtspmonitor.app.BackgroundRecordingTest background.log -e rtspBase rtsp://10.0.2.2:18554 ;;
    notifications-denied)
     rtsp_restore_notifications=true

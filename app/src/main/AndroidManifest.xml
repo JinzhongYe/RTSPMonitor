@@ -9,5 +9,6 @@
 <uses-permission android:name="android.permission.WAKE_LOCK" />
 <application android:name=".MonitorApp" android:label="RTSP Monitor" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:dataExtractionRules="@xml/data_extraction_rules" android:fullBackupContent="false" android:icon="@android:drawable/presence_video_online" android:supportsRtl="true">
 <activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>
+<activity android:name=".PlaybackActivity" android:exported="false" />
 <service android:name=".RecordingForegroundService" android:foregroundServiceType="connectedDevice" android:exported="false" />
 </application></manifest>

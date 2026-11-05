@@ -26,6 +26,13 @@ class VlcPlayer(context: Context): RtspPlayerEngine {
  private var localResumeAt = -1L
  private val mutable = MutableStateFlow(PlayerStatus())
  override val status = mutable.asStateFlow()
+ private val mutablePlayback = kotlinx.coroutines.flow.MutableStateFlow(com.rtspmonitor.core.PlaybackStatus())
+ val playback = mutablePlayback.asStateFlow()
+ fun refreshPlayback() { mutablePlayback.value=com.rtspmonitor.core.PlaybackStatus(player.time.coerceAtLeast(0),player.length.coerceAtLeast(0),player.rate,player.isPlaying,player.isSeekable,mutable.value.error) }
+ fun pausePlayback() { player.pause();refreshPlayback() }
+ fun resumePlayback() { if(mutable.value.state==ConnectionState.DISCONNECTED) player.setTime(0,false);player.play();refreshPlayback() }
+ fun seekPlayback(ms:Long) { if(player.isSeekable) player.setTime(ms.coerceIn(0,player.length.coerceAtLeast(0)),false);refreshPlayback() }
+ fun speedPlayback(rate:Float) { require(rate in listOf(0.5f,1f,1.5f,2f));player.setRate(rate);refreshPlayback() }
  private val recordProbe = MutableStateFlow(RecordProbeStatus())
  val recordProbeStatus = recordProbe.asStateFlow()
  private var width = 0
@@ -105,6 +112,7 @@ class VlcPlayer(context: Context): RtspPlayerEngine {
   runCatching { localFile?.close() }; localFile = null; localResumeAt = -1L
  }
  fun playLocal(uri: Uri) {
+  player.setRate(1f)
   stopInput(); width = 0; height = 0
   mutable.value = PlayerStatus(ConnectionState.CONNECTING)
   try {

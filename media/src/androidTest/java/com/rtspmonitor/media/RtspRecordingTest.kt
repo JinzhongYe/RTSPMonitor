@@ -17,6 +17,27 @@ import java.util.concurrent.CopyOnWriteArrayList
 /** Opt-in against synthetic sources: -e rtspBase rtsp://10.0.2.2:18554 */
 @RunWith(AndroidJUnit4::class)
 class RtspRecordingTest {
+    @Test fun sourceChangesAreUnionedWithinOneSegment()=runBlocking {
+        val base=InstrumentationRegistry.getArguments().getString("rtspBase");assumeTrue(base!=null)
+        val context=InstrumentationRegistry.getInstrumentation().targetContext
+        val folder=File(context.getExternalFilesDir("spike-results"),"sources-${System.currentTimeMillis()}").apply { mkdirs() }
+        val frames=java.util.concurrent.atomic.AtomicInteger()
+        val engine=AvRecorder().apply { sourceProvider={if(frames.incrementAndGet()<=5) 1 else 2} }
+        val began=CompletableDeferred<Unit>();val closed=CompletableDeferred<File>()
+        val job=async(Dispatchers.IO) { engine.record(Connection("$base/h264","","",Transport.TCP),folder,2) { kind,value ->
+            if(kind=="recording")began.complete(Unit)
+            if(kind=="segment")closed.complete(File(value))
+        } }
+        try {
+            withTimeout(20000) { began.await() }
+            val file=withTimeout(20000) { closed.await() }
+            engine.stop();assertEquals(0,job.await())
+            val metadata=org.json.JSONObject(File(folder,file.nameWithoutExtension+".meta").readText())
+            assertEquals(3,metadata.getInt("sources"))
+            assertTrue(metadata.getLong("endedAt")>metadata.getLong("startedAt"))
+            checkVideo(file,"video/avc")
+        } finally { engine.stop();withContext(NonCancellable) { job.join() };engine.close() }
+    }
     @Test fun h264Tcp() = record("h264", Transport.TCP, "video/avc")
     @Test fun h264Udp() = record("h264", Transport.UDP, "video/avc")
     @Test fun h265Tcp() = record("h265", Transport.TCP, "video/hevc")

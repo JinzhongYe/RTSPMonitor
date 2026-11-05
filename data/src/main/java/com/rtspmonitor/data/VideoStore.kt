@@ -5,7 +5,7 @@ import android.media.MediaFormat
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import com.rtspmonitor.core.safeCameraName
+import com.rtspmonitor.core.*
 import com.rtspmonitor.core.inspectMp4Structure
 import com.rtspmonitor.core.requireRecordingSpace
 import java.io.File
@@ -27,6 +27,24 @@ class VideoStore(private val context: Context, private val dao: MonitorDao) {
    java.io.RandomAccessFile(file,"rw").use { it.setLength(structure.recoverableLength); it.fd.sync() }
   }
   validate(file)
+  if(!structure.complete) {
+   val sidecar=File(file.parentFile,file.nameWithoutExtension+".meta")
+   if(sidecar.exists() || File(sidecar.path+".bak").exists()) {
+    val atomic=android.util.AtomicFile(sidecar)
+    val data=org.json.JSONObject(atomic.readFully().toString(Charsets.UTF_8))
+    val extractor=MediaExtractor()
+    var end=0L;var previous=-1L;var interval=0L
+    try {
+     extractor.setDataSource(file.path)
+     val track=(0 until extractor.trackCount).first { extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("video/")==true }
+     extractor.selectTrack(track)
+     do { val pts=extractor.sampleTime; if(pts>previous && previous>=0)interval=pts-previous; previous=pts;end=maxOf(end,pts) } while(extractor.advance())
+    } finally { extractor.release() }
+    data.put("endedAt",minOf(data.getLong("endedAt"),data.getLong("startedAt")+(end+interval)/1000))
+    val output=atomic.startWrite()
+    try { output.write(data.toString().toByteArray());atomic.finishWrite(output) } catch(e:Throwable) { atomic.failWrite(output);throw e }
+   }
+  }
  }
  fun validate(file: File) {
   check(file.length() > 0) { "空录像文件" }
@@ -53,13 +71,22 @@ class VideoStore(private val context: Context, private val dao: MonitorDao) {
   if(File(file.path + ".uri").exists()) { publishLegacy(file,camera);return }
   validate(file);checkSpace()
   val directory=File(context.noBackupFilesDir,"videos").apply { mkdirs() }
-  val name="${safeCameraName(camera.name)}_${System.currentTimeMillis()}_${UUID.randomUUID()}.mp4"
+  val metaFile=File(file.parentFile,file.nameWithoutExtension+".meta")
+  val meta=if(metaFile.exists() || File(metaFile.path+".bak").exists()) org.json.JSONObject(android.util.AtomicFile(metaFile).readFully().toString(Charsets.UTF_8)) else null
+  val start=meta?.getLong("startedAt")
+  val end=meta?.getLong("endedAt")
+  val offset=meta?.getInt("offsetMinutes")
+  val sources=meta?.getInt("sources") ?: 0
+  val base=if(start!=null && end!=null && offset!=null) recordingRangeName(SegmentMetadata(start,end,offset,sources)) else "时间未知_${UUID.randomUUID()}"
+  var name="$base.mp4"
+  var sequence=1
+  while(File(directory,name).exists() || File(directory,name+".local-index").exists()) { name="${base}_${sequence++}.mp4" }
   val target=File(directory,name)
   val index=File(target.path+".local-index")
   val created=System.currentTimeMillis()
-  index.writeText(org.json.JSONObject().put("cameraId",camera.id).put("name",name).put("createdAt",created).toString())
+  index.writeText(org.json.JSONObject().put("cameraId",camera.id).put("name",name).put("createdAt",created).put("startedAt",start).put("endedAt",end).put("offsetMinutes",offset).put("sources",sources).toString())
   check(file.renameTo(target)) { "无法保存录像，临时文件已保留" }
-  try { dao.save(Recording(Uri.fromFile(target).toString(),camera.id,name,created));index.delete() }
+  try { dao.save(Recording(Uri.fromFile(target).toString(),camera.id,name,created,startedAt=start,endedAt=end,offsetMinutes=offset,sourceMask=sources));index.delete();metaFile.delete() }
   catch(e:Throwable) { if(target.renameTo(file))index.delete();throw e }
  }
  suspend fun export(item:Recording): String = exportLock.withLock { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
@@ -120,7 +147,7 @@ class VideoStore(private val context: Context, private val dao: MonitorDao) {
    val file=File(index.path.removeSuffix(".local-index"))
    if(file.exists()) {
     val p=org.json.JSONObject(index.readText());validate(file)
-    dao.save(Recording(Uri.fromFile(file).toString(),p.getString("cameraId"),p.getString("name"),p.getLong("createdAt")))
+    dao.save(Recording(Uri.fromFile(file).toString(),p.getString("cameraId"),p.getString("name"),p.getLong("createdAt"),startedAt=if(p.isNull("startedAt")) null else p.getLong("startedAt"),endedAt=if(p.isNull("endedAt")) null else p.getLong("endedAt"),offsetMinutes=if(p.isNull("offsetMinutes")) null else p.getInt("offsetMinutes"),sourceMask=p.optInt("sources")))
    }
    index.delete()
   }

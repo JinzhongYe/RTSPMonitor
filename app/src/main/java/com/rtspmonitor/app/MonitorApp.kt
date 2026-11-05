@@ -3,7 +3,7 @@ import android.app.Application
 import androidx.room.Room
 import com.rtspmonitor.data.*
 class MonitorApp: Application() {
- val database by lazy { Room.databaseBuilder(this, MonitorDatabase::class.java, "monitor.db").addMigrations(MONITOR_MIGRATION_1_2).build() }
+ val database by lazy { Room.databaseBuilder(this, MonitorDatabase::class.java, "monitor.db").addMigrations(MONITOR_MIGRATION_1_2, MONITOR_MIGRATION_2_3).build() }
  val vault by lazy { CredentialVault() }
  val store by lazy { VideoStore(this, database.dao()) }
  val sessions by lazy { CameraSessionManager(this) }

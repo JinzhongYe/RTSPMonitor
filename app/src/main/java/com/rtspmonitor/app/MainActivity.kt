@@ -38,12 +38,6 @@ class MonitorViewModel(application: android.app.Application): AndroidViewModel(a
  val app = application as MonitorApp
  val cameras = app.database.dao().cameras()
  val recordings = app.database.dao().recordings()
- val localPlayer = VlcPlayer(app)
- var localUri by mutableStateOf<String?>(null)
-  private set
- fun playRecording(uri: String) { localUri = uri; localPlayer.playLocal(android.net.Uri.parse(uri)) }
- fun closeRecording() { localPlayer.disconnect(); localUri = null }
- override fun onCleared() { localPlayer.release(); super.onCleared() }
  val ready = mutableStateOf(false)
  init { viewModelScope.launch { app.sessions.recover(); ready.value = true } }
  val preferences = app.getSharedPreferences("monitor", android.content.Context.MODE_PRIVATE)
@@ -139,14 +133,13 @@ class MainActivity: ComponentActivity() {
  val monitoring by vm.app.sessions.monitoring.collectAsState()
  val manual by vm.app.sessions.manualRecording.collectAsState()
  val automatic by vm.app.sessions.automaticRecording.collectAsState()
- LaunchedEffect(activity.resumeCount) { vm.closeRecording() }
  val camera = cameras.firstOrNull { it.id == vm.activeId } ?: cameras.singleOrNull()
  LaunchedEffect(camera?.id) { if(camera != null && vm.activeId != camera.id) vm.selectCamera(camera) }
  var settings by rememberSaveable { mutableStateOf(false) }
  var full by rememberSaveable { mutableStateOf(false) }
+ var filter by rememberSaveable { mutableIntStateOf(0) }
  var deleting by remember { mutableStateOf<Recording?>(null) }
- val local = vm.localUri
- val player = if(local != null) vm.localPlayer else camera?.let { vm.app.sessions.session(it.id).player }
+ val player = camera?.let { vm.app.sessions.session(it.id).player }
  val state = camera?.let { states[it.id] } ?: SessionStatus()
  val busy = state.recordingState in listOf(RecordingState.PREPARING, RecordingState.RECORDING, RecordingState.FINALIZING, RecordingState.INTERRUPTED)
  fun exitFull() { full = false; activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED }
@@ -176,14 +169,14 @@ class MainActivity: ComponentActivity() {
     Card(Modifier.fillMaxWidth()) {
      Box(Modifier.fillMaxWidth().aspectRatio(16f/9f).background(Color.Black), contentAlignment=Alignment.Center) {
       if(player != null) key(player) { AndroidView(factory={ playerView(it, player) }, modifier=Modifier.fillMaxSize(), onRelease={ player.detach(it) }) }
-      if(local == null && state.connectionState == ConnectionState.DISCONNECTED) Text(if(camera == null) "请先配置摄像头" else "点击连接，查看实时画面", color=Color.White)
+      if(state.connectionState == ConnectionState.DISCONNECTED) Text(if(camera == null) "请先配置摄像头" else "点击连接，查看实时画面", color=Color.White)
      }
      Column(Modifier.padding(16.dp), verticalArrangement=Arrangement.spacedBy(8.dp)) {
-      Text(if(local != null) "正在回放录像" else "预览 · ${connectionLabel(state.connectionState)}", style=MaterialTheme.typography.titleMedium)
+      Text("预览 · ${connectionLabel(state.connectionState)}", style=MaterialTheme.typography.titleMedium)
       Text("录像 · ${recordingLabel(state.recordingState)}" + if(state.reconnectCount > 0) " · 重连 ${state.reconnectCount} 次" else "")
       state.lastError?.let { Text(it, color=MaterialTheme.colorScheme.error) }
       Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-       Button(enabled=camera != null && vm.ready.value && !vm.saving, onClick={ camera?.let { vm.closeRecording(); activity.command("CONNECT",it.id) } }) { Text("连接") }
+       Button(enabled=camera != null && vm.ready.value && !vm.saving, onClick={ camera?.let { activity.command("CONNECT",it.id) } }) { Text("连接") }
        OutlinedButton(enabled=camera != null && !vm.saving && !monitoring, onClick={ camera?.let { activity.command("DISCONNECT",it.id) } }) { Text("断开") }
        TextButton(enabled=player != null, onClick={ full=true; activity.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE }) { Text("全屏") }
       }
@@ -199,8 +192,7 @@ class MainActivity: ComponentActivity() {
       if(monitoring)Text(detectionStatus)
       if(automatic)Text("活动录像中，无活动30秒后停止")
       if(manual)Text("手动录像中，自动事件结束不会停止手动录像")
-      if(android.os.Build.VERSION.SDK_INT>=33 && activity.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED)Text("通知未授权，活动提醒无法显示",color=MaterialTheme.colorScheme.error)
-      if(local != null) TextButton(onClick={ vm.closeRecording() }) { Text("返回实时监控") }
+      key(activity.resumeCount) { if(!activity.getSystemService(android.app.NotificationManager::class.java).areNotificationsEnabled() || activity.getSystemService(android.app.NotificationManager::class.java).getNotificationChannel("activity")?.importance==android.app.NotificationManager.IMPORTANCE_NONE)Text("通知未授权，活动提醒无法显示",color=MaterialTheme.colorScheme.error) }
       if(camera == null && cameras.isEmpty()) Button(enabled=vm.ready.value, onClick={ settings=true }) { Text("配置摄像头") }
      }
     }
@@ -208,12 +200,14 @@ class MainActivity: ComponentActivity() {
    if(message.isNotEmpty()) item { Text(message, style=MaterialTheme.typography.bodyMedium) }
    item { Text("录像 (${recordings.size})", style=MaterialTheme.typography.titleLarge) }
    if(recordings.isEmpty()) item { Text("暂无录像，开始录像后会自动分段保存。") }
-   items(recordings, key={ it.uri }) { r ->
+   item { Row { listOf(0 to "全部",1 to "手动",2 to "活动").forEach { (mask,label) -> TextButton(onClick={filter=mask}) { Text(if(filter==mask) "✓ $label" else label) } } } }
+   items(recordings.filter { filter==0 || it.sourceMask and filter !=0 }, key={ it.uri }) { r ->
     OutlinedCard(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
+     Text(if(r.sourceMask==3) "手动＋活动" else recordingSourceLabel(r.sourceMask), style=MaterialTheme.typography.labelLarge)
      Text(r.name, style=MaterialTheme.typography.titleSmall)
-     Text(java.text.DateFormat.getDateTimeInstance().format(java.util.Date(r.createdAt)), style=MaterialTheme.typography.bodySmall)
+     Text(if(r.startedAt!=null && r.endedAt!=null && r.offsetMinutes!=null) recordingRangeName(SegmentMetadata(r.startedAt!!,r.endedAt!!,r.offsetMinutes!!,r.sourceMask)).substringBeforeLast('_') else "录制时间未知（历史录像）", style=MaterialTheme.typography.bodySmall)
      Row {
-      TextButton(onClick={ vm.playRecording(r.uri) }) { Text("回放") }
+      TextButton(onClick={ activity.startActivity(Intent(activity,PlaybackActivity::class.java).putExtra("uri",r.uri)) }) { Text("回放") }
       TextButton(enabled=vm.exporting==null,onClick={ vm.export(r) }) { Text(if(vm.exporting==r.uri) "保存中…" else if(r.exportedUri!=null || android.net.Uri.parse(r.uri).scheme!="file") "已保存到相册" else "保存到相册") }
       TextButton(enabled=vm.exporting!=r.uri,onClick={ deleting=r }) { Text("删除") }
      }
@@ -223,7 +217,7 @@ class MainActivity: ComponentActivity() {
   }
  }
  if(settings) CameraSettings(vm, camera) { settings=false }
- deleting?.let { r -> AlertDialog(onDismissRequest={ deleting=null }, title={ Text("删除录像？") }, text={ Text("删除应用内录像后无法恢复，已经导出的相册副本不受影响；旧版相册录像会删除原文件。") }, confirmButton={ TextButton(onClick={ if(local==r.uri) vm.closeRecording(); vm.delete(r); deleting=null }) { Text("删除") } }, dismissButton={ TextButton(onClick={ deleting=null }) { Text("取消") } }) }
+ deleting?.let { r -> AlertDialog(onDismissRequest={ deleting=null }, title={ Text("删除录像？") }, text={ Text("删除应用内录像后无法恢复，已经导出的相册副本不受影响；旧版相册录像会删除原文件。") }, confirmButton={ TextButton(onClick={ vm.delete(r); deleting=null }) { Text("删除") } }, dismissButton={ TextButton(onClick={ deleting=null }) { Text("取消") } }) }
 }
 @Composable private fun CameraSettings(vm: MonitorViewModel, camera: Camera?, dismiss: () -> Unit) {
  val connection = remember(camera) { camera?.let { vm.connection(it) } }

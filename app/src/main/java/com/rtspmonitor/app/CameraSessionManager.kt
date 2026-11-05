@@ -14,6 +14,7 @@ class CameraSessionManager(private val app: MonitorApp) {
   val commands = Mutex()
   var removed = false
   val state = MutableStateFlow(SessionStatus())
+  @Volatile var sources: Int = 0
   var recordingEngine: AvRecorder? = null
   var job: Job? = null
   var observer: Job? = null
@@ -85,7 +86,7 @@ class CameraSessionManager(private val app: MonitorApp) {
      }
      withContext(Dispatchers.IO) { app.store.checkSpace() }
      val directory = File(app.store.temporary, "${camera.id}/${UUID.randomUUID()}").apply { mkdirs() }
-     val recorder = AvRecorder(); s.recordingEngine = recorder
+     val recorder = AvRecorder().apply { sourceProvider = { s.sources } }; s.recordingEngine = recorder
      var storageFailure = false
      val publisher = SegmentPublisher(this, { file -> app.store.publish(file, camera) }, { recorder.stop() })
      val result = try { recorder.record(connection, directory) { kind, value ->

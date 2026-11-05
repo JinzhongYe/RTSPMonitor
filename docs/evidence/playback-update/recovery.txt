@@ -1,0 +1,9 @@
+
+com.rtspmonitor.media.RecoveryTest:..
+com.rtspmonitor.media.WriteFailureTest:.
+
+Time: 3.337
+
+OK (3 tests)
+
+

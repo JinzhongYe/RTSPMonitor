@@ -1,5 +1,8 @@
 # 测试矩阵
 
+0.6.0 新增独立回放、来源与时间范围命名；测试计数、活动通知的原生环境阻塞见[本轮记录](PLAYBACK_RECORDING_UPDATE.md)。
+
+
 每次记录 APK/源码版本、Android/API、机型/SoC、摄像头固件、编码/分辨率/fps/GOP/码率、音频、传输、网络和证据文件。凭据不得写入报告。状态用 PASS / FAIL / BLOCKED / NOT_RUN；没有设备证据不得用 PASS。
 
 ## 当前交付结果

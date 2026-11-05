@@ -1,0 +1,8 @@
+
+com.rtspmonitor.media.RtspRecordingTest:....
+
+Time: 23.829
+
+OK (4 tests)
+
+

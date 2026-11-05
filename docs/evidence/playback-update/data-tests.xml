@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="6" failures="0" errors="0" skipped="0" time="0.448" timestamp="2026-11-05T09:52:16" hostname="localhost">
+  <testsuite name="com.rtspmonitor.data.MigrationTest" tests="2" failures="0" errors="0" skipped="0" time="0.068" timestamp="2026-11-05T09:52:16" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":data" />
+    </properties>
+    <testcase name="exportedLocalRecordingsSurviveVersionTwoUpgrade" classname="com.rtspmonitor.data.MigrationTest" time="0.067" />
+    <testcase name="existingGalleryRecordingsSurviveUpgrade" classname="com.rtspmonitor.data.MigrationTest" time="0.001" />
+  </testsuite>
+  <testsuite name="com.rtspmonitor.data.StoreTest" tests="3" failures="0" errors="0" skipped="0" time="0.057" timestamp="2026-11-05T09:52:16" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":data" />
+    </properties>
+    <testcase name="pendingRecordingCannotBeDeleted" classname="com.rtspmonitor.data.StoreTest" time="0.027" />
+    <testcase name="deletingPrivateVideoCleansFailedPendingExport" classname="com.rtspmonitor.data.StoreTest" time="0.029" />
+    <testcase name="orphanPendingRowsAndMissingPublishedIndexesAreReconciled" classname="com.rtspmonitor.data.StoreTest" time="0.001" />
+  </testsuite>
+  <testsuite name="com.rtspmonitor.data.VaultTest" tests="1" failures="0" errors="0" skipped="0" time="0.0" timestamp="2026-11-05T09:52:16" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":data" />
+    </properties>
+    <testcase name="credentialsRoundTripAndTamperingFails" classname="com.rtspmonitor.data.VaultTest" time="0.0" />
+  </testsuite>
+</testsuites>

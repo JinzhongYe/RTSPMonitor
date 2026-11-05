@@ -40,11 +40,10 @@ class SingleCameraConfigTest {
    assertEquals(2, app.database.dao().cameras().first().size)
    val recreated = withContext(Dispatchers.Main) { MonitorViewModel(app) }
    assertEquals(updated.id, recreated.activeId)
-   withContext(Dispatchers.Main) { recreated.localPlayer.release() }
    assertEquals(1, app.sessions.decodeLimit)
    assertEquals(1, app.sessions.recordingLimit)
   } finally {
-   withContext(Dispatchers.Main) { app.sessions.stopAll(); vm.localPlayer.release() }
+   withContext(Dispatchers.Main) { app.sessions.stopAll() }
    app.database.dao().cameras().first().forEach { app.database.dao().delete(it) }
    vm.preferences.edit().remove("active_camera").commit()
   }

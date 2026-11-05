@@ -1,0 +1,53 @@
+--------- beginning of crash
+11-05 17:47:32.028  4475  4609 F libc    : Fatal signal 4 (SIGILL), code 1 (ILL_ILLOPC), fault addr 0x7aaf042854 in tid 4609 (drishti/4609), pid 4475 (rtspmonitor.app)
+11-05 17:47:32.378  4613  4613 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-05 17:47:32.378  4613  4613 F DEBUG   : Build fingerprint: 'google/sdk_gphone64_arm64/emu64a:15/AE3A.240806.043/12960925:userdebug/dev-keys'
+11-05 17:47:32.378  4613  4613 F DEBUG   : Revision: '0'
+11-05 17:47:32.378  4613  4613 F DEBUG   : ABI: 'arm64'
+11-05 17:47:32.378  4613  4613 F DEBUG   : Timestamp: 2026-11-05 17:47:32.099642421+0800
+11-05 17:47:32.378  4613  4613 F DEBUG   : Process uptime: 12s
+11-05 17:47:32.378  4613  4613 F DEBUG   : Cmdline: com.rtspmonitor.app
+11-05 17:47:32.378  4613  4613 F DEBUG   : pid: 4475, tid: 4609, name: drishti/4609  >>> com.rtspmonitor.app <<<
+11-05 17:47:32.378  4613  4613 F DEBUG   : uid: 10209
+11-05 17:47:32.378  4613  4613 F DEBUG   : tagged_addr_ctrl: 0000000000000001 (PR_TAGGED_ADDR_ENABLE)
+11-05 17:47:32.378  4613  4613 F DEBUG   : pac_enabled_keys: 000000000000000f (PR_PAC_APIAKEY, PR_PAC_APIBKEY, PR_PAC_APDAKEY, PR_PAC_APDBKEY)
+11-05 17:47:32.378  4613  4613 F DEBUG   : signal 4 (SIGILL), code 1 (ILL_ILLOPC), fault addr 0x0000007aaf042854
+11-05 17:47:32.378  4613  4613 F DEBUG   :     x0  0000007aaf1e1c08  x1  0000007aaf1e1bdc  x2  0000007aaf1e1bdc  x3  b400007d730ecf80
+11-05 17:47:32.378  4613  4613 F DEBUG   :     x4  b400007d730ecf80  x5  0000000000000001  x6  0000000000000003  x7  0000000000000002
+11-05 17:47:32.378  4613  4613 F DEBUG   :     x8  000000000000a7fc  x9  0000000000000001  x10 0000000000000003  x11 b400007d730fc640
+11-05 17:47:32.378  4613  4613 F DEBUG   :     x12 b400007d730ff820  x13 0000000000000000  x14 0000000000000041  x15 b400007b4a6a4bb0
+11-05 17:47:32.378  4613  4613 F DEBUG   :     x16 0000000000000001  x17 0000007d599739e0  x18 0000007aab5a0000  x19 0000007aaf1b0154
+11-05 17:47:32.378  4613  4613 F DEBUG   :     x20 0000007aaf1b9a58  x21 0000007aaef9b95c  x22 0000007aaf10e438  x23 0000000000000000
+11-05 17:47:32.378  4613  4613 F DEBUG   :     x24 0000000000000000  x25 00000000000000e8  x26 00000000000000e0  x27 b400007bca69c110
+11-05 17:47:32.378  4613  4613 F DEBUG   :     x28 b400007b4a6a1110  x29 b400007aca6304f4
+11-05 17:47:32.378  4613  4613 F DEBUG   :     lr  0000007aaeef5b98  sp  0000007ab27e5280  pc  0000007aaf042854  pst 0000000080000000
+11-05 17:47:32.378  4613  4613 F DEBUG   : 28 total frames
+11-05 17:47:32.378  4613  4613 F DEBUG   : backtrace:
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #00 pc 0000000000e3d854  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #01 pc 0000000000cf0b94  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #02 pc 0000000000cf1840  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #03 pc 0000000000d969c4  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #04 pc 0000000000e3c8fc  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #05 pc 0000000000d9693c  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #06 pc 0000000000d3e3e8  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #07 pc 0000000000d3f880  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #08 pc 0000000000d369cc  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #09 pc 0000000000a9213c  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #10 pc 0000000000cd8860  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #11 pc 0000000000cd8294  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #12 pc 0000000000a7eafc  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #13 pc 0000000000cdda7c  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #14 pc 0000000000cddff0  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #15 pc 0000000000cadc0c  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #16 pc 0000000000cadad4  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #17 pc 0000000000cada68  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #18 pc 0000000000cad7a0  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #19 pc 0000000000cad6b0  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #20 pc 0000000000715ee0  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #21 pc 0000000000712738  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #22 pc 000000000071210c  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #23 pc 0000000000815d90  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #24 pc 0000000000802058  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #25 pc 0000000000812a24  /data/app/~~oa4XKnbipro7RV8CWqiu_A==/com.rtspmonitor.app-mAHVv5frwxPw1A4dIv_Amg==/base.apk!libmediapipe_tasks_jni.so (offset 0x1de4000) (BuildId: a9684bc9591f3db67c13855eff9a2d03)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #26 pc 000000000006c354  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start(void*)+196) (BuildId: 1b9fecf834d610f77e641f026ca7269b)
+11-05 17:47:32.378  4613  4613 F DEBUG   :       #27 pc 000000000005efc4  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 1b9fecf834d610f77e641f026ca7269b)

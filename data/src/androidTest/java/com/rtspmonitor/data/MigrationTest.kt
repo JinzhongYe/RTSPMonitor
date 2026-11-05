@@ -12,21 +12,27 @@ import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class MigrationTest {
- @Test fun existingGalleryRecordingsSurviveUpgrade()=runBlocking {
+ @Test fun existingGalleryRecordingsSurviveUpgrade()=upgrade(1)
+ @Test fun exportedLocalRecordingsSurviveVersionTwoUpgrade()=upgrade(2)
+ private fun upgrade(version:Int)=runBlocking {
   val context=InstrumentationRegistry.getInstrumentation().targetContext
   val name="migration-${UUID.randomUUID()}.db"
   context.openOrCreateDatabase(name,0,null).use { db ->
    db.execSQL("CREATE TABLE Camera (id TEXT NOT NULL PRIMARY KEY, name TEXT NOT NULL, encryptedConnection TEXT NOT NULL)")
    db.execSQL("CREATE TABLE Recording (uri TEXT NOT NULL PRIMARY KEY, cameraId TEXT NOT NULL, name TEXT NOT NULL, createdAt INTEGER NOT NULL)")
    db.execSQL("INSERT INTO Recording VALUES ('content://media/external/video/media/123','camera','old.mp4',123)")
-   db.version=1
+   if(version==2) {
+    db.execSQL("ALTER TABLE Recording ADD COLUMN exportedUri TEXT")
+    db.execSQL("UPDATE Recording SET exportedUri='content://media/external/video/media/456'")
+   }
+   db.version=version
   }
-  val db=Room.databaseBuilder(context,MonitorDatabase::class.java,name).addMigrations(MONITOR_MIGRATION_1_2).build()
+  val db=Room.databaseBuilder(context,MonitorDatabase::class.java,name).addMigrations(MONITOR_MIGRATION_1_2,MONITOR_MIGRATION_2_3).build()
   try {
    val row=db.dao().recordings().first().single()
    assertEquals("old.mp4",row.name)
    assertEquals("content://media/external/video/media/123",row.uri)
-   assertNull(row.exportedUri)
+   if(version==1) assertNull(row.exportedUri) else assertEquals("content://media/external/video/media/456",row.exportedUri);assertNull(row.startedAt);assertNull(row.endedAt);assertEquals(0,row.sourceMask)
   } finally { db.close();context.deleteDatabase(name) }
  }
 }

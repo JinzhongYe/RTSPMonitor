@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.rtspmonitor.core.PolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-05T09:44:23.047Z" hostname="xiejinzhongdeMac-mini.local" time="0.005">
+  <properties/>
+  <testcase name="namesCannotEscapeMoviesDirectory" classname="com.rtspmonitor.core.PolicyTest" time="0.004"/>
+  <testcase name="rejectsNonRtsp" classname="com.rtspmonitor.core.PolicyTest" time="0.0"/>
+  <testcase name="connectionNeverPrintsSecrets" classname="com.rtspmonitor.core.PolicyTest" time="0.0"/>
+  <testcase name="preservesValidCameraNames" classname="com.rtspmonitor.core.PolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
