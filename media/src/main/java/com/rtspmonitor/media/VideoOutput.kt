@@ -105,6 +105,7 @@ internal class VideoOutput {
   released=true;texture.setOnFrameAvailableListener(null);current(buffer);surface.release();texture.release();window?.let { EGL14.eglDestroySurface(display,it) }
   GLES20.glDeleteProgram(program);GLES20.glDeleteTextures(1,intArrayOf(textureId),0)
   EGL14.eglMakeCurrent(display,EGL14.EGL_NO_SURFACE,EGL14.EGL_NO_SURFACE,EGL14.EGL_NO_CONTEXT)
-  EGL14.eglDestroySurface(display,buffer);EGL14.eglDestroyContext(display,context);EGL14.eglTerminate(display);thread.quitSafely()
+  // The default display is process-wide; other players may still own EGL contexts.
+  EGL14.eglDestroySurface(display,buffer);EGL14.eglDestroyContext(display,context);thread.quitSafely()
  } }
 }
