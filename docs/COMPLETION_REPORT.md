@@ -7,7 +7,7 @@
 ## 交付物
 
 - [Android 工程入口](../settings.gradle.kts)：Gradle Kotlin DSL，`app`、`core`、`data`、`media` 四模块。
-- [可安装 Debug APK](../app/build/outputs/apk/debug/app-debug.apk)：用于技术验证，包含 arm64-v8a / x86_64，不是正式签名发布包。
+- [可安装 Debug APK](https://github.com/JinzhongYe/RTSPMonitor/releases/download/v0.3-spike/RTSPMonitor-0.3-spike-debug.apk)：用于技术验证，包含 arm64-v8a / x86_64，不是正式签名发布包。
 - [架构说明](ARCHITECTURE.md)、[技术验证历史](TECHNICAL_SPIKE.md)、[测试矩阵](TEST_MATRIX.md)、[依赖与许可证材料状态](DEPENDENCIES.md)。
 - [第 2～6 步媒体实测报告](STEPS_2_6_VALIDATION.md)及其[原始证据](evidence/steps-2-6/)；[本次收尾证据](evidence/completion/)包含构建、认证、通知权限拒绝与回归结果。
 - [环境、APK 校验和及测试计数](evidence/completion/environment.json)。历史证据保留对应版本，不将跳过用例计作通过。

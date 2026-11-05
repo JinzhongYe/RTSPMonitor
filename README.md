@@ -2,6 +2,9 @@
 
 Android 原生 Kotlin / Compose 工程，最低 Android 10，当前 compile/target 37。此版本用于技术验证，**真实摄像头与锁屏验收尚未完成**。
 
+
+[下载 0.3-spike 测试安装包](https://github.com/JinzhongYe/RTSPMonitor/releases/tag/v0.3-spike)（私有仓库需登录 GitHub；Android Debug 签名）。
+
 ```bash
 # 需要 JDK 21、Android SDK 37.0、NDK 27.0.12077973、make、curl、tar
 # local.properties 中配置 sdk.dir；原生脚本通过 ANDROID_SDK_ROOT 定位 SDK
