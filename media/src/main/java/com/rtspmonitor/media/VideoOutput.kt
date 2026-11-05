@@ -64,6 +64,7 @@ internal class VideoOutput {
   surface=Surface(texture)
  }
  private fun current(target:EGLSurface) { check(EGL14.eglMakeCurrent(display,target,target,context)) }
+ fun resize(width:Int,height:Int) { if(width>0 && height>0)handler.post { if(!released)texture.setDefaultBufferSize(width,height) } }
  fun show(surface:Surface?) { handler.post {
   if(released)return@post
   current(buffer);window?.let { EGL14.eglDestroySurface(display,it) };window=null

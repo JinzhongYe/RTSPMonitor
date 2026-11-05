@@ -53,7 +53,7 @@ jobs:
           emulator-boot-timeout: 300
           disable-animations: true
           script: |
-            bash gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.app.SingleCameraConfigTest
+            bash gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.app.SingleCameraConfigTest,com.rtspmonitor.app.DetectionTest
             bash gradlew :data:connectedDebugAndroidTest
             bash gradlew :media:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.media.FixtureTest,com.rtspmonitor.media.MediaStoreVideoTest#h264PublishAndDelete,com.rtspmonitor.media.MediaStoreVideoTest#h265PublishAndDelete -Pandroid.testInstrumentationRunnerArguments.generateFixtures=true -Pandroid.testInstrumentationRunnerArguments.useFixtures=true
             adb install -r app/build/outputs/apk/debug/app-debug.apk

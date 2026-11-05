@@ -75,6 +75,7 @@ class RecordingForegroundService: Service() {
        try {
         val result=withContext(Dispatchers.Default) { detector?.detect(bitmap,now) }
         if(flag("auto") && result!=null) {
+         app.sessions.detectionStatus.value=if(result.first) "检测到人形" else if(result.second) "检测到画面变化" else "未检测到活动"
          val before=policy.active
          policy.sample(result.first,result.second,now)
          if(!before && policy.active) { eventId++;attempted=false;notifyEvent("正在准备自动录像") }

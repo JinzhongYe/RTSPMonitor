@@ -24,6 +24,7 @@ class CameraSessionManager(private val app: MonitorApp) {
  private val sessions = mutableMapOf<String, Session>()
  val states = MutableStateFlow<Map<String, SessionStatus>>(emptyMap())
  val message = MutableStateFlow("")
+ val detectionStatus = MutableStateFlow("等待画面")
  val monitoring = MutableStateFlow(false)
  val manualRecording = MutableStateFlow(false)
  val automaticRecording = MutableStateFlow(false)

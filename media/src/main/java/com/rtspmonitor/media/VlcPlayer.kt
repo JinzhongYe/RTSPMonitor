@@ -37,7 +37,7 @@ class VlcPlayer(context: Context): RtspPlayerEngine {
   override fun onSurfacesCreated(vout: IVLCVout) { surfacesReady = true; if(attachedOwner != null) player.setVideoTrackEnabled(true) }
   override fun onSurfacesDestroyed(vout: IVLCVout) { surfacesReady = false }
  }
- init { player.vlcVout.setVideoSurface(output.surface, null); player.vlcVout.attachViews { _, cw, ch, vw, vh, _, _ -> width=if(vw>0)vw else cw; height=if(vh>0)vh else ch; android.os.Handler(android.os.Looper.getMainLooper()).post { onVideoSize?.invoke(width,height,1,1) }; updateStatus() }; player.vlcVout.addCallback(surfaceCallback); player.setEventListener { event ->
+ init { player.vlcVout.setVideoSurface(output.surface, null); player.vlcVout.setWindowSize(640,360); player.vlcVout.attachViews { _, cw, ch, vw, vh, _, _ -> width=if(vw>0)vw else cw; height=if(vh>0)vh else ch; output.resize(width,height); if(width>0 && height>0)player.vlcVout.setWindowSize(width,height); android.os.Handler(android.os.Looper.getMainLooper()).post { onVideoSize?.invoke(width,height,1,1) }; updateStatus() }; player.vlcVout.addCallback(surfaceCallback); player.setEventListener { event ->
   when(event.type) {
    MediaPlayer.Event.RecordChanged -> recordProbe.value = RecordProbeStatus(event.recording, event.recordPath)
    MediaPlayer.Event.Opening -> mutable.value = PlayerStatus(ConnectionState.CONNECTING)

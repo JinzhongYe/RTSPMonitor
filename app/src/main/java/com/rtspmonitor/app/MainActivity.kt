@@ -135,6 +135,7 @@ class MainActivity: ComponentActivity() {
  val recordings by vm.recordings.collectAsState(initial = emptyList())
  val states by vm.app.sessions.states.collectAsState()
  val message by vm.app.sessions.message.collectAsState()
+ val detectionStatus by vm.app.sessions.detectionStatus.collectAsState()
  val monitoring by vm.app.sessions.monitoring.collectAsState()
  val manual by vm.app.sessions.manualRecording.collectAsState()
  val automatic by vm.app.sessions.automaticRecording.collectAsState()
@@ -194,6 +195,7 @@ class MainActivity: ComponentActivity() {
        Switch(checked=monitoring,enabled=camera!=null && vm.ready.value && !vm.saving,onCheckedChange={ enabled -> camera?.let { activity.command(if(enabled) "AUTO_ON" else "AUTO_OFF",it.id) } })
        Text("自动监控：${if(monitoring) "已开启" else "已关闭"}")
       }
+      if(monitoring)Text(detectionStatus)
       if(automatic)Text("活动录像中，无活动30秒后停止")
       if(manual)Text("手动录像中，自动事件结束不会停止手动录像")
       if(android.os.Build.VERSION.SDK_INT>=33 && activity.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED)Text("通知未授权，活动提醒无法显示",color=MaterialTheme.colorScheme.error)
