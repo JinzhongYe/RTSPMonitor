@@ -55,9 +55,12 @@ class VideoStore(private val context: Context, private val dao: MonitorDao) {
   val directory=File(context.noBackupFilesDir,"videos").apply { mkdirs() }
   val name="${safeCameraName(camera.name)}_${System.currentTimeMillis()}_${UUID.randomUUID()}.mp4"
   val target=File(directory,name)
+  val index=File(target.path+".local-index")
+  val created=System.currentTimeMillis()
+  index.writeText(org.json.JSONObject().put("cameraId",camera.id).put("name",name).put("createdAt",created).toString())
   check(file.renameTo(target)) { "无法保存录像，临时文件已保留" }
-  try { dao.save(Recording(Uri.fromFile(target).toString(),camera.id,name,System.currentTimeMillis())) }
-  catch(e:Throwable) { check(target.renameTo(file));throw e }
+  try { dao.save(Recording(Uri.fromFile(target).toString(),camera.id,name,created));index.delete() }
+  catch(e:Throwable) { if(target.renameTo(file))index.delete();throw e }
  }
  suspend fun export(item:Recording): String = exportLock.withLock { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
   val recording=dao.recordings().first().firstOrNull { it.uri==item.uri } ?: error("录像不存在")
@@ -113,6 +116,14 @@ class VideoStore(private val context: Context, private val dao: MonitorDao) {
  }
  @Suppress("DEPRECATION")
  suspend fun reconcile() {
+  File(context.noBackupFilesDir,"videos").listFiles()?.filter { it.name.endsWith(".local-index") }?.forEach { index ->
+   val file=File(index.path.removeSuffix(".local-index"))
+   if(file.exists()) {
+    val p=org.json.JSONObject(index.readText());validate(file)
+    dao.save(Recording(Uri.fromFile(file).toString(),p.getString("cameraId"),p.getString("name"),p.getLong("createdAt")))
+   }
+   index.delete()
+  }
   val resolver = context.contentResolver
   val references = temporary.walkTopDown().filter { it.isFile && it.extension == "uri" && File(it.path.removeSuffix(".uri")).exists() }.map { it.readText() }.toSet()
   val collection = MediaStore.setIncludePending(MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
@@ -125,6 +136,7 @@ class VideoStore(private val context: Context, private val dao: MonitorDao) {
   dao.recordings().first().forEach { item ->
    val exists = if(Uri.parse(item.uri).scheme=="file") File(checkNotNull(Uri.parse(item.uri).path)).exists() else resolver.query(Uri.parse(item.uri), arrayOf(MediaStore.Video.Media._ID), null, null, null)?.use { it.moveToFirst() } ?: false
    if(!exists) dao.delete(item)
+   else if(Uri.parse(item.uri).scheme=="file" && File(Uri.parse(item.uri).path+".export-uri").exists()) runCatching { export(item) }
   }
  }
  suspend fun delete(recording: Recording) {

@@ -31,12 +31,13 @@ class VlcPlayer(context: Context): RtspPlayerEngine {
  private var width = 0
  private var height = 0
  private var attachedOwner: View? = null
+ private var onVideoSize: ((Int,Int,Int,Int)->Unit)?=null
  private var surfacesReady = false
  private val surfaceCallback = object: IVLCVout.Callback {
   override fun onSurfacesCreated(vout: IVLCVout) { surfacesReady = true; if(attachedOwner != null) player.setVideoTrackEnabled(true) }
   override fun onSurfacesDestroyed(vout: IVLCVout) { surfacesReady = false }
  }
- init { player.vlcVout.setVideoSurface(output.surface, null); player.vlcVout.attachViews { _, cw, ch, vw, vh, _, _ -> width=if(vw>0)vw else cw; height=if(vh>0)vh else ch; updateStatus() }; player.vlcVout.addCallback(surfaceCallback); player.setEventListener { event ->
+ init { player.vlcVout.setVideoSurface(output.surface, null); player.vlcVout.attachViews { _, cw, ch, vw, vh, _, _ -> width=if(vw>0)vw else cw; height=if(vh>0)vh else ch; android.os.Handler(android.os.Looper.getMainLooper()).post { onVideoSize?.invoke(width,height,1,1) }; updateStatus() }; player.vlcVout.addCallback(surfaceCallback); player.setEventListener { event ->
   when(event.type) {
    MediaPlayer.Event.RecordChanged -> recordProbe.value = RecordProbeStatus(event.recording, event.recordPath)
    MediaPlayer.Event.Opening -> mutable.value = PlayerStatus(ConnectionState.CONNECTING)
@@ -63,7 +64,7 @@ class VlcPlayer(context: Context): RtspPlayerEngine {
   mutable.value = PlayerStatus(if(player.isPlaying) ConnectionState.CONNECTED else mutable.value.state, "$dimensions ${track?.codec ?: ""}；硬解已请求，实际后端待实机确认")
  }
  internal fun attach(surface: SurfaceView, subtitles: SurfaceView, owner: View, onSize: (Int, Int, Int, Int) -> Unit) {
-  attachedOwner=owner
+  attachedOwner=owner;onVideoSize=onSize
   val callback=object: android.view.SurfaceHolder.Callback {
    override fun surfaceCreated(holder:android.view.SurfaceHolder) { if(attachedOwner===owner) output.show(holder.surface) }
    override fun surfaceChanged(holder:android.view.SurfaceHolder, format:Int, w:Int, h:Int) { if(attachedOwner===owner) output.show(holder.surface) }
@@ -76,7 +77,7 @@ class VlcPlayer(context: Context): RtspPlayerEngine {
  internal fun windowSize(owner:View,width:Int,height:Int) { }
  fun detach(owner:View?=null) {
   if(owner!=null && owner!==attachedOwner)return
-  attachedOwner=null;output.show(null)
+  attachedOwner=null;onVideoSize=null;output.show(null)
  }
  override fun connect(connection: Connection) = open(connection, null)
  private fun open(c: Connection, sout: String?) {

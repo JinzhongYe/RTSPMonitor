@@ -26,6 +26,7 @@ internal class VideoOutput {
  private var program = 0
  private var textureId = 0
  private var lastSample = 0L
+ private var released=false
  @Volatile var onFrame: ((Bitmap, Long) -> Unit)? = null
  private val matrix = FloatArray(16)
  private val pixels = ByteBuffer.allocateDirect(320 * 320 * 4).order(ByteOrder.nativeOrder())
@@ -64,6 +65,7 @@ internal class VideoOutput {
  }
  private fun current(target:EGLSurface) { check(EGL14.eglMakeCurrent(display,target,target,context)) }
  fun show(surface:Surface?) { handler.post {
+  if(released)return@post
   current(buffer);window?.let { EGL14.eglDestroySurface(display,it) };window=null
   if(surface!=null && surface.isValid) {
    val next=EGL14.eglCreateWindowSurface(display,config,surface,intArrayOf(EGL14.EGL_NONE),0)
@@ -81,6 +83,7 @@ internal class VideoOutput {
   GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4)
  }
  private fun draw() {
+  if(released)return
   current(buffer);texture.updateTexImage();texture.getTransformMatrix(matrix)
   val now=android.os.SystemClock.elapsedRealtime()
   onFrame?.let { callback -> if(now-lastSample>=500) {
@@ -91,13 +94,14 @@ internal class VideoOutput {
    if(upright!==raw)raw.recycle();callback(upright,now)
   } }
   window?.let { target ->
-   current(target)
+   try { current(target)
    val w=IntArray(1);val h=IntArray(1);EGL14.eglQuerySurface(display,target,EGL14.EGL_WIDTH,w,0);EGL14.eglQuerySurface(display,target,EGL14.EGL_HEIGHT,h,0)
-   render(w[0],h[0]);EGL14.eglSwapBuffers(display,target)
+   render(w[0],h[0]);check(EGL14.eglSwapBuffers(display,target))
+   } catch(e:RuntimeException) { current(buffer);EGL14.eglDestroySurface(display,target);window=null }
   }
  }
  fun release() { onFrame=null;handler.post {
-  current(buffer);surface.release();texture.release();window?.let { EGL14.eglDestroySurface(display,it) }
+  released=true;texture.setOnFrameAvailableListener(null);current(buffer);surface.release();texture.release();window?.let { EGL14.eglDestroySurface(display,it) }
   GLES20.glDeleteProgram(program);GLES20.glDeleteTextures(1,intArrayOf(textureId),0)
   EGL14.eglMakeCurrent(display,EGL14.EGL_NO_SURFACE,EGL14.EGL_NO_SURFACE,EGL14.EGL_NO_CONTEXT)
   EGL14.eglDestroySurface(display,buffer);EGL14.eglDestroyContext(display,context);EGL14.eglTerminate(display);thread.quitSafely()

@@ -33,7 +33,7 @@ class RecordingForegroundService: Service() {
  private fun notification(text:String,alarm:Boolean=false):Notification {
   val open=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
   val builder=Notification.Builder(this,if(alarm) "activity" else "recording").setSmallIcon(android.R.drawable.presence_video_online)
-   .setContentTitle(if(alarm) "检测到摄像头活动" else "RTSP Monitor").setContentText(text).setContentIntent(open).setOnlyAlertOnce(true)
+   .setContentTitle(if(alarm) "摄像头活动与录像" else "RTSP Monitor").setContentText(text).setContentIntent(open).setOnlyAlertOnce(true)
   if(!alarm) {
    val stop=PendingIntent.getService(this,1,Intent(this,javaClass).setAction("STOP_ALL"),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
    builder.setOngoing(true).addAction(Notification.Action.Builder(null,"停止所有任务",stop).build())
@@ -124,7 +124,7 @@ class RecordingForegroundService: Service() {
  }
  override fun onDestroy() {
   scope.launch { try {
-   app.sessions.states.value.keys.toList().forEach { app.sessions.session(it).player.frameListener=null }
+   app.sessions.states.value.keys.toList().forEach { app.sessions.session(it).player.frameListener=null;app.sessions.disconnect(it) }
    app.sessions.stopAll();detector?.let { value -> withContext(Dispatchers.Default) { value.close() } };detector=null
   } finally { wakeLock?.let { if(it.isHeld)it.release() };scope.cancel() } }
   super.onDestroy()
