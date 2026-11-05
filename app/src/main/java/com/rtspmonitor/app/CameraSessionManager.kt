@@ -24,6 +24,9 @@ class CameraSessionManager(private val app: MonitorApp) {
  private val sessions = mutableMapOf<String, Session>()
  val states = MutableStateFlow<Map<String, SessionStatus>>(emptyMap())
  val message = MutableStateFlow("")
+ val monitoring = MutableStateFlow(false)
+ val manualRecording = MutableStateFlow(false)
+ val automaticRecording = MutableStateFlow(false)
  val decodeLimit = 1
  val recordingLimit = 1
  private fun update(id: String, state: SessionStatus) { sessions[id]?.state?.value = state; states.value = sessions.mapValues { it.value.state.value } }

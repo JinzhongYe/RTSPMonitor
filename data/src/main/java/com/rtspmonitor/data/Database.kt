@@ -14,7 +14,7 @@ import javax.crypto.spec.GCMParameterSpec
 import org.json.JSONObject
 
 @Entity data class Camera(@PrimaryKey val id: String, val name: String, val encryptedConnection: String)
-@Entity data class Recording(@PrimaryKey val uri: String, val cameraId: String, val name: String, val createdAt: Long)
+@Entity data class Recording(@PrimaryKey val uri: String, val cameraId: String, val name: String, val createdAt: Long, val exportedUri: String? = null)
 @Dao interface MonitorDao {
  @Query("SELECT * FROM Camera ORDER BY name") fun cameras(): Flow<List<Camera>>
  @Query("SELECT * FROM Camera WHERE id = :id") suspend fun camera(id: String): Camera?
@@ -24,7 +24,7 @@ import org.json.JSONObject
  @Query("SELECT * FROM Recording ORDER BY createdAt DESC") fun recordings(): Flow<List<Recording>>
  @Delete suspend fun delete(recording: Recording)
 }
-@Database(entities = [Camera::class, Recording::class], version = 1, exportSchema = false)
+@Database(entities = [Camera::class, Recording::class], version = 2, exportSchema = false)
 abstract class MonitorDatabase: RoomDatabase() { abstract fun dao(): MonitorDao }
 class CredentialVault {
  private fun key(): SecretKey {
@@ -45,4 +45,8 @@ class CredentialVault {
   val p = JSONObject(String(cipher.doFinal(bytes.copyOfRange(12, bytes.size)), Charsets.UTF_8))
   return Connection(p.getString("url"), p.getString("user"), p.getString("password"), Transport.valueOf(p.getString("transport")))
  }
+}
+
+val MONITOR_MIGRATION_1_2 = object: androidx.room.migration.Migration(1,2) {
+ override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("ALTER TABLE Recording ADD COLUMN exportedUri TEXT") }
 }

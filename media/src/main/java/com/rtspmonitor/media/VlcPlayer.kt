@@ -17,6 +17,10 @@ data class RecordProbeStatus(val active: Boolean = false, val path: String? = nu
 class VlcPlayer(context: Context): RtspPlayerEngine {
  private val vlc = LibVLC(context, arrayListOf("--quiet", "--no-stats"))
  private val player = MediaPlayer(vlc)
+ private val output = VideoOutput()
+ var frameListener: ((android.graphics.Bitmap, Long) -> Unit)?
+  get() = output.onFrame
+  set(value) { output.onFrame = value }
  private val resolver = context.applicationContext.contentResolver
  private var localFile: android.os.ParcelFileDescriptor? = null
  private var localResumeAt = -1L
@@ -32,7 +36,7 @@ class VlcPlayer(context: Context): RtspPlayerEngine {
   override fun onSurfacesCreated(vout: IVLCVout) { surfacesReady = true; if(attachedOwner != null) player.setVideoTrackEnabled(true) }
   override fun onSurfacesDestroyed(vout: IVLCVout) { surfacesReady = false }
  }
- init { player.vlcVout.addCallback(surfaceCallback); player.setEventListener { event ->
+ init { player.vlcVout.setVideoSurface(output.surface, null); player.vlcVout.attachViews { _, cw, ch, vw, vh, _, _ -> width=if(vw>0)vw else cw; height=if(vh>0)vh else ch; updateStatus() }; player.vlcVout.addCallback(surfaceCallback); player.setEventListener { event ->
   when(event.type) {
    MediaPlayer.Event.RecordChanged -> recordProbe.value = RecordProbeStatus(event.recording, event.recordPath)
    MediaPlayer.Event.Opening -> mutable.value = PlayerStatus(ConnectionState.CONNECTING)
@@ -59,25 +63,20 @@ class VlcPlayer(context: Context): RtspPlayerEngine {
   mutable.value = PlayerStatus(if(player.isPlaying) ConnectionState.CONNECTED else mutable.value.state, "$dimensions ${track?.codec ?: ""}；硬解已请求，实际后端待实机确认")
  }
  internal fun attach(surface: SurfaceView, subtitles: SurfaceView, owner: View, onSize: (Int, Int, Int, Int) -> Unit) {
-  detach()
-  attachedOwner = owner
-  player.vlcVout.apply {
-   setVideoView(surface)
-   setSubtitlesView(subtitles)
-   attachViews { _, codedWidth, codedHeight, visibleWidth, visibleHeight, sarNum, sarDen ->
-    width = if(visibleWidth > 0) visibleWidth else codedWidth; height = if(visibleHeight > 0) visibleHeight else codedHeight
-    onSize(width, height, sarNum, sarDen)
-    updateStatus()
-   }
+  attachedOwner=owner
+  val callback=object: android.view.SurfaceHolder.Callback {
+   override fun surfaceCreated(holder:android.view.SurfaceHolder) { if(attachedOwner===owner) output.show(holder.surface) }
+   override fun surfaceChanged(holder:android.view.SurfaceHolder, format:Int, w:Int, h:Int) { if(attachedOwner===owner) output.show(holder.surface) }
+   override fun surfaceDestroyed(holder:android.view.SurfaceHolder) { if(attachedOwner===owner) output.show(null) }
   }
+  surface.holder.addCallback(callback)
+  if(surface.holder.surface.isValid) output.show(surface.holder.surface)
+  onSize(width.coerceAtLeast(16),height.coerceAtLeast(9),1,1)
  }
- internal fun windowSize(owner: View, width: Int, height: Int) { if(owner === attachedOwner && !player.isReleased && width > 0 && height > 0) player.vlcVout.setWindowSize(width, height) }
- fun detach(owner: View? = null) {
-  if(owner != null && owner !== attachedOwner) return
-  if(localFile != null && player.isPlaying) localResumeAt = player.time.coerceAtLeast(0)
-  attachedOwner = null; surfacesReady = false
-  player.setVideoTrackEnabled(false)
-  player.vlcVout.detachViews()
+ internal fun windowSize(owner:View,width:Int,height:Int) { }
+ fun detach(owner:View?=null) {
+  if(owner!=null && owner!==attachedOwner)return
+  attachedOwner=null;output.show(null)
  }
  override fun connect(connection: Connection) = open(connection, null)
  private fun open(c: Connection, sout: String?) {
@@ -117,7 +116,7 @@ class VlcPlayer(context: Context): RtspPlayerEngine {
   }
  }
  override fun disconnect() { stopInput(); width = 0; height = 0; mutable.value = PlayerStatus() }
- override fun release() { player.setEventListener(null); player.vlcVout.removeCallback(surfaceCallback); detach(); stopInput(); player.release(); vlc.release() }
+ override fun release() { player.setEventListener(null); player.vlcVout.removeCallback(surfaceCallback); detach(); stopInput(); player.release(); output.release(); vlc.release() }
 
 }
 

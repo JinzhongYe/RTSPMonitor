@@ -51,15 +51,20 @@ class MediaStoreVideoTest {
             assertFalse("Published temporary file must be removed", file.exists())
             assertTrue(item.name.startsWith("Camera_01-门口_"))
             val uri = android.net.Uri.parse(item.uri)
-            context.contentResolver.query(uri, arrayOf(MediaStore.Video.Media.RELATIVE_PATH, MediaStore.Video.Media.IS_PENDING), null, null, null)!!.use {
+            assertEquals("file",uri.scheme)
+            val exported=store.export(item)
+            assertEquals(exported,store.export(item))
+            context.contentResolver.query(android.net.Uri.parse(exported), arrayOf(MediaStore.Video.Media.RELATIVE_PATH, MediaStore.Video.Media.IS_PENDING), null, null, null)!!.use {
                 assertTrue(it.moveToFirst())
-                assertEquals("Movies/RTSPMonitor/", it.getString(0))
+                assertEquals("DCIM/RTSPMonitor/", it.getString(0))
                 assertEquals(0, it.getInt(1))
             }
             val expected = MessageDigest.getInstance("SHA-256").digest(fixture.readBytes())
             val actual = context.contentResolver.openInputStream(uri)!!.use { MessageDigest.getInstance("SHA-256").digest(it.readBytes()) }
             assertArrayEquals("MediaStore copy must preserve every byte", expected, actual)
             store.delete(item)
+            context.contentResolver.openInputStream(android.net.Uri.parse(exported))!!.use { assertTrue(it.read()!=-1) }
+            context.contentResolver.delete(android.net.Uri.parse(exported),null,null)
             published = null
             assertTrue(db.dao().recordings().first().isEmpty())
         } finally {

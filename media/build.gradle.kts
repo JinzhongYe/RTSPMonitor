@@ -27,3 +27,5 @@ dependencies {
     androidTestImplementation(project(":data"))
     androidTestImplementation(libs.room)
 }
+
+dependencies { implementation("com.google.mediapipe:tasks-vision:1.2.2") }

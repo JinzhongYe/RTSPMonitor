@@ -12,8 +12,11 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class VideoStore(private val context: Context, private val dao: MonitorDao) {
+ private val exportLock=Mutex()
  val temporary = File(context.noBackupFilesDir, "recordings").apply { mkdirs() }
  fun checkSpace() { requireRecordingSpace(temporary.usableSpace) }
  fun recoverTemporary(file: File) {
@@ -46,6 +49,41 @@ class VideoStore(private val context: Context, private val dao: MonitorDao) {
   } finally { extractor.release() }
  }
  suspend fun publish(file: File, camera: Camera) {
+  // Finish legacy exports in place so upgrades do not orphan pending videos.
+  if(File(file.path + ".uri").exists()) { publishLegacy(file,camera);return }
+  validate(file);checkSpace()
+  val directory=File(context.noBackupFilesDir,"videos").apply { mkdirs() }
+  val name="${safeCameraName(camera.name)}_${System.currentTimeMillis()}_${UUID.randomUUID()}.mp4"
+  val target=File(directory,name)
+  check(file.renameTo(target)) { "无法保存录像，临时文件已保留" }
+  try { dao.save(Recording(Uri.fromFile(target).toString(),camera.id,name,System.currentTimeMillis())) }
+  catch(e:Throwable) { check(target.renameTo(file));throw e }
+ }
+ suspend fun export(item:Recording): String = exportLock.withLock { kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+  val recording=dao.recordings().first().firstOrNull { it.uri==item.uri } ?: error("录像不存在")
+  if(Uri.parse(recording.uri).scheme!="file") return@withContext recording.uri
+  val file=File(checkNotNull(Uri.parse(recording.uri).path))
+  require(file.canonicalFile.parentFile==File(context.noBackupFilesDir,"videos").canonicalFile)
+  validate(file);requireRecordingSpace(temporary.usableSpace,file.length())
+  val resolver=context.contentResolver
+  val journal=File(file.path+".export-uri")
+  var uri:Uri?=recording.exportedUri?.let { Uri.parse(it) }
+  fun exists(value:Uri):Boolean=runCatching { resolver.query(value,arrayOf(MediaStore.MediaColumns._ID),null,null,null)?.use { it.moveToFirst() }==true }.getOrDefault(false)
+  if(uri!=null && exists(uri)) return@withContext uri.toString()
+  uri=if(journal.exists()) Uri.parse(journal.readText()).takeIf { exists(it) } else null
+  if(uri==null) {
+   uri=checkNotNull(resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,ContentValues().apply {
+    put(MediaStore.MediaColumns.DISPLAY_NAME,recording.name);put(MediaStore.MediaColumns.MIME_TYPE,"video/mp4")
+    put(MediaStore.MediaColumns.RELATIVE_PATH,"DCIM/RTSPMonitor/");put(MediaStore.MediaColumns.IS_PENDING,1)
+   }))
+   journal.writeText(uri.toString())
+  }
+  resolver.openOutputStream(uri,"rwt")!!.use { out -> file.inputStream().use { it.copyTo(out) } }
+  check(resolver.update(uri,ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING,0) },null,null)==1)
+  dao.save(recording.copy(exportedUri=uri.toString()));journal.delete();uri.toString()
+ } }
+ private suspend fun publishLegacy(file: File, camera: Camera) {
+
   validate(file)
   checkSpace()
   requireRecordingSpace(temporary.usableSpace, file.length())
@@ -85,11 +123,16 @@ class VideoStore(private val context: Context, private val dao: MonitorDao) {
    }
   }
   dao.recordings().first().forEach { item ->
-   val exists = resolver.query(Uri.parse(item.uri), arrayOf(MediaStore.Video.Media._ID), null, null, null)?.use { it.moveToFirst() } ?: false
+   val exists = if(Uri.parse(item.uri).scheme=="file") File(checkNotNull(Uri.parse(item.uri).path)).exists() else resolver.query(Uri.parse(item.uri), arrayOf(MediaStore.Video.Media._ID), null, null, null)?.use { it.moveToFirst() } ?: false
    if(!exists) dao.delete(item)
   }
  }
  suspend fun delete(recording: Recording) {
+  if(Uri.parse(recording.uri).scheme=="file") {
+   val file=File(checkNotNull(Uri.parse(recording.uri).path))
+   require(file.canonicalFile.parentFile==File(context.noBackupFilesDir,"videos").canonicalFile)
+   check(!file.exists() || file.delete());dao.delete(recording);return
+  }
   val removed = context.contentResolver.delete(Uri.parse(recording.uri), "${MediaStore.Video.Media.IS_PENDING}=0", null)
   check(removed > 0) { "录像尚未完成或已不存在，不能删除" }
   dao.delete(recording)
