@@ -139,11 +139,16 @@ class VideoStore(private val context: Context, private val dao: MonitorDao) {
    else if(Uri.parse(item.uri).scheme=="file" && File(Uri.parse(item.uri).path+".export-uri").exists()) runCatching { export(item) }
   }
  }
- suspend fun delete(recording: Recording) {
+ suspend fun delete(recording: Recording) = exportLock.withLock {
   if(Uri.parse(recording.uri).scheme=="file") {
    val file=File(checkNotNull(Uri.parse(recording.uri).path))
    require(file.canonicalFile.parentFile==File(context.noBackupFilesDir,"videos").canonicalFile)
-   check(!file.exists() || file.delete());dao.delete(recording);return
+   val journal=File(file.path+".export-uri")
+   if(journal.exists()) {
+    context.contentResolver.delete(Uri.parse(journal.readText()),"${MediaStore.MediaColumns.IS_PENDING}=1",null)
+    check(journal.delete())
+   }
+   check(!file.exists() || file.delete());dao.delete(recording);return@withLock
   }
   val removed = context.contentResolver.delete(Uri.parse(recording.uri), "${MediaStore.Video.Media.IS_PENDING}=0", null)
   check(removed > 0) { "录像尚未完成或已不存在，不能删除" }

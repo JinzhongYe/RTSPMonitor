@@ -215,7 +215,7 @@ class MainActivity: ComponentActivity() {
      Row {
       TextButton(onClick={ vm.playRecording(r.uri) }) { Text("回放") }
       TextButton(enabled=vm.exporting==null,onClick={ vm.export(r) }) { Text(if(vm.exporting==r.uri) "保存中…" else if(r.exportedUri!=null || android.net.Uri.parse(r.uri).scheme!="file") "已保存到相册" else "保存到相册") }
-      TextButton(onClick={ deleting=r }) { Text("删除") }
+      TextButton(enabled=vm.exporting!=r.uri,onClick={ deleting=r }) { Text("删除") }
      }
     } }
    }
