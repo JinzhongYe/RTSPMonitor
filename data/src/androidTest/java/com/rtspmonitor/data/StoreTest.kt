@@ -31,9 +31,9 @@ import org.junit.runner.RunWith
    VideoStore(context,db.dao()).delete(item)
    assertFalse(file.exists());assertFalse(journal.exists())
    assertTrue(db.dao().recordings().first().isEmpty())
-   val exists=resolver.query(uri,arrayOf(MediaStore.MediaColumns._ID),null,null,null)?.use { it.moveToFirst() } ?: false
+   val exists=resolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,arrayOf(MediaStore.MediaColumns._ID),"_id=?",arrayOf(android.content.ContentUris.parseId(uri).toString()),null)?.use { it.moveToFirst() } ?: false
    assertFalse(exists)
-  } finally { file.delete();journal.delete();resolver.delete(uri,null,null);db.close() }
+  } finally { file.delete();journal.delete();runCatching { resolver.delete(uri,null,null) };db.close() }
  }
  @Test fun orphanPendingRowsAndMissingPublishedIndexesAreReconciled() = runBlocking {
   val context = InstrumentationRegistry.getInstrumentation().targetContext
