@@ -2,7 +2,7 @@
 
 Android 单路摄像头监控、活动检测与后台录像，最低 Android 10。
 
-[下载 v0.5.0 测试版](https://github.com/JinzhongYe/RTSPMonitor/releases/tag/v0.5.0)
+[下载 v0.6.0 测试版](https://github.com/JinzhongYe/RTSPMonitor/releases/tag/v0.6.0)
 
 ## 使用
 

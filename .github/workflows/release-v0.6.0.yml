@@ -1,0 +1,45 @@
+name: Publish v0.6.0
+on: workflow_dispatch
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: JinzhongYe/RTSPMonitor
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify and publish fixed-signature build
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/$GH_REPO/actions/runs/42033268378 --jq .conclusion)" = success
+          test "$(gh api repos/$GH_REPO/actions/runs/42033268378 --jq .head_sha)" = d8d764bbf56a7aa10a6a577f13abf2cd0961bcec
+          git diff --exit-code d8d764bbf56a7aa10a6a577f13abf2cd0961bcec HEAD -- app core data media tools gradle build.gradle.kts settings.gradle.kts gradle.properties gradlew gradlew.bat
+          gh run download 42033268378 --name RTSPMonitor-0.6.0 --dir dist
+          (cd dist && sha256sum --check SHA256SUMS.txt)
+          rtsp_signer=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n 1)
+          "$rtsp_signer" verify --print-certs dist/RTSPMonitor-0.6.0-debug.apk > dist/apk-signature.txt
+          grep -qi ff51a90e4557e7cf86f3e19b771a4c432d7e5969317cedf7e3d001ae7f9597d3 dist/apk-signature.txt
+          cp docs/PLAYBACK_RECORDING_UPDATE.md dist/
+          gh api repos/$GH_REPO/actions/runs/42033268378 --jq '{buildRun:.html_url,sourceCommit:.head_sha,conclusion}' > dist/build-provenance.json
+          (cd dist && sha256sum RTSPMonitor-0.6.0-debug.apk apk-signature.txt PLAYBACK_RECORDING_UPDATE.md build-provenance.json > SHA256SUMS.txt)
+          gh release create v0.6.0 dist/* --target d8d764bbf56a7aa10a6a577f13abf2cd0961bcec --title 'v0.6.0 - 独立回放与录像分类' --draft --prerelease --notes-file docs/RELEASE_NOTES_0.6.0.md
+          gh api repos/$GH_REPO/releases > "$RUNNER_TEMP/rtsp-releases.json"
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,subprocess
+          release=next(r for r in json.load(open(os.environ['RUNNER_TEMP']+'/rtsp-releases.json')) if r['tag_name']=='v0.6.0')
+          expected={p.name:p for p in pathlib.Path('dist').iterdir() if p.is_file()}
+          assets={a['name']:a for a in release['assets']}
+          assert assets.keys()==expected.keys()
+          for name,p in expected.items():
+              assert assets[name]['state']=='uploaded'
+              assert assets[name]['size']==p.stat().st_size
+              assert assets[name]['digest']=='sha256:'+hashlib.sha256(p.read_bytes()).hexdigest()
+          subprocess.run(['gh','api','--method','PATCH',f"repos/{os.environ['GH_REPO']}/releases/{release['id']}",'-F','draft=false','-F','prerelease=true'],check=True,stdout=subprocess.DEVNULL)
+          print('Published v0.6.0; all asset digests verified.')
+          PY
