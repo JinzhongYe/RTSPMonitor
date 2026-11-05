@@ -162,7 +162,7 @@ class MainActivity: ComponentActivity() {
    item {
     Row(Modifier.fillMaxWidth(), verticalAlignment=Alignment.CenterVertically, horizontalArrangement=Arrangement.SpaceBetween) {
      Column { Text("RTSP Monitor", style=MaterialTheme.typography.headlineSmall); Text(camera?.name ?: "单路监控", style=MaterialTheme.typography.bodyMedium) }
-     TextButton(enabled=vm.ready.value && !vm.saving && (camera != null || cameras.isEmpty()), onClick={ settings=true }) { Text("设置") }
+     TextButton(enabled=vm.ready.value && !vm.saving && !monitoring && !manual && (camera != null || cameras.isEmpty()), onClick={ settings=true }) { Text("设置") }
     }
    }
    if(camera == null && cameras.size > 1) item {
@@ -195,6 +195,7 @@ class MainActivity: ComponentActivity() {
        Switch(checked=monitoring,enabled=camera!=null && vm.ready.value && !vm.saving,onCheckedChange={ enabled -> camera?.let { activity.command(if(enabled) "AUTO_ON" else "AUTO_OFF",it.id) } })
        Text("自动监控：${if(monitoring) "已开启" else "已关闭"}")
       }
+      if(monitoring || manual)Text("修改连接设置前，请先停止手动录像并关闭自动监控",style=MaterialTheme.typography.bodySmall)
       if(monitoring)Text(detectionStatus)
       if(automatic)Text("活动录像中，无活动30秒后停止")
       if(manual)Text("手动录像中，自动事件结束不会停止手动录像")

@@ -31,7 +31,7 @@ class RecordingForegroundService: Service() {
   manager.createNotificationChannel(NotificationChannel("activity","活动提醒",NotificationManager.IMPORTANCE_HIGH))
  }
  private fun notification(text:String,alarm:Boolean=false):Notification {
-  val open=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+  val open=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
   val builder=Notification.Builder(this,if(alarm) "activity" else "recording").setSmallIcon(android.R.drawable.presence_video_online)
    .setContentTitle(if(alarm) "摄像头活动与录像" else "RTSP Monitor").setContentText(text).setContentIntent(open).setOnlyAlertOnce(true)
   if(!alarm) {
