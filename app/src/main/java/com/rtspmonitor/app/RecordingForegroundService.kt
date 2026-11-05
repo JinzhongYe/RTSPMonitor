@@ -80,7 +80,7 @@ class RecordingForegroundService: Service() {
          policy.sample(result.first,result.second,now)
          if(!before && policy.active) { eventId++;attempted=false;notifyEvent("正在准备自动录像") }
         }
-       } catch(e:Exception) { if(e is CancellationException)throw e;set("auto",false);policy.reset();app.sessions.message.value="检测失败，自动监控已关闭" }
+       } catch(e:Exception) { if(e is CancellationException)throw e;android.util.Log.e("ActivityDetection","Frame processing failed",e);set("auto",false);policy.reset();app.sessions.message.value="检测失败，自动监控已关闭" }
        finally { bitmap.recycle();detecting.set(false) }
       }
      }

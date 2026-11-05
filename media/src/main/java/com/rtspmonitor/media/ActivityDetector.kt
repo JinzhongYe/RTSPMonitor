@@ -19,7 +19,8 @@ class ActivityDetector(context: Context): AutoCloseable {
  private var previous:IntArray?=null
  private var lastFrame=0L
  @Synchronized fun detect(bitmap:Bitmap,now:Long):Pair<Boolean,Boolean> {
-  val image=BitmapImageBuilder(bitmap).build()
+  // MPImage.close recycles its Bitmap; the caller still needs the original for motion comparison.
+  val image=BitmapImageBuilder(checkNotNull(bitmap.copy(Bitmap.Config.ARGB_8888,false))).build()
   val person=try { detector.detectForVideo(image,now).detections().isNotEmpty() } finally { image.close() }
   val gray=IntArray(64*36) { i ->
    val color=bitmap.getPixel((i%64)*bitmap.width/64,(i/64)*bitmap.height/36)
