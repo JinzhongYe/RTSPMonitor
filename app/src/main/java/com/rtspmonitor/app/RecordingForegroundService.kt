@@ -59,6 +59,7 @@ class RecordingForegroundService: Service() {
  private suspend fun runMonitor() {
   var lastLock=0L
   try {
+   app.sessions.recover()
    while(currentCoroutineContext().isActive) {
     val id=prefs.getString("active_camera",null) ?: break
     val camera=app.database.dao().camera(id) ?: break
@@ -78,7 +79,7 @@ class RecordingForegroundService: Service() {
          app.sessions.detectionStatus.value=if(result.first) "检测到人形" else if(result.second) "检测到画面变化" else "未检测到活动"
          val before=policy.active
          policy.sample(result.first,result.second,now)
-         if(!before && policy.active) { eventId++;attempted=false;notifyEvent("正在准备自动录像") }
+         if(!before && policy.active) { eventId=prefs.getInt("event_notification",100)+1;prefs.edit().putInt("event_notification",eventId).apply();attempted=false;notifyEvent("正在准备自动录像") }
         }
        } catch(e:Exception) { if(e is CancellationException)throw e;android.util.Log.e("ActivityDetection","Frame processing failed",e);set("auto",false);policy.reset();app.sessions.message.value="检测失败，自动监控已关闭" }
        finally { bitmap.recycle();detecting.set(false) }
