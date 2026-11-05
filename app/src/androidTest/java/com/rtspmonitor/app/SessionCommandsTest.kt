@@ -49,7 +49,7 @@ import java.util.UUID
    withContext(Dispatchers.Main) {
     app.sessions.connect(cameras[0]); app.sessions.connect(cameras[1]); app.sessions.probe(cameras[1])
     assertEquals(ConnectionState.DISCONNECTED,app.sessions.session(cameras[1].id).player.status.value.state)
-    assertTrue(app.sessions.message.value.contains("配额"))
+    assertTrue(app.sessions.message.value.contains("一路"))
    }
   } finally {
    withContext(Dispatchers.Main) { cameras.forEach { app.sessions.remove(it) } }
