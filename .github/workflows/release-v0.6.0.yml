@@ -9,6 +9,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: JinzhongYe/RTSPMonitor
+      DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,11 +23,17 @@ jobs:
           git diff --exit-code d8d764bbf56a7aa10a6a577f13abf2cd0961bcec HEAD -- app core data media tools gradle build.gradle.kts settings.gradle.kts gradle.properties gradlew gradlew.bat
           gh run download 42033268378 --name RTSPMonitor-0.6.0 --dir dist
           (cd dist && sha256sum --check SHA256SUMS.txt)
+          sha256sum dist/RTSPMonitor-0.6.0-debug.apk | cut -d ' ' -f 1 > "$RUNNER_TEMP/rtsp-input-sha256"
+          test -n "$DEBUG_KEYSTORE"
+          printf '%s' "$DEBUG_KEYSTORE" | base64 --decode > "$RUNNER_TEMP/rtsp-debug.keystore"
           rtsp_signer=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n 1)
+          "$rtsp_signer" sign --ks "$RUNNER_TEMP/rtsp-debug.keystore" --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --v4-signing-enabled false dist/RTSPMonitor-0.6.0-debug.apk
+          rm -f "$RUNNER_TEMP/rtsp-debug.keystore"
           "$rtsp_signer" verify --print-certs dist/RTSPMonitor-0.6.0-debug.apk > dist/apk-signature.txt
           grep -qi ff51a90e4557e7cf86f3e19b771a4c432d7e5969317cedf7e3d001ae7f9597d3 dist/apk-signature.txt
           cp docs/PLAYBACK_RECORDING_UPDATE.md dist/
           gh api repos/$GH_REPO/actions/runs/42033268378 --jq '{buildRun:.html_url,sourceCommit:.head_sha,conclusion}' > dist/build-provenance.json
+          python3 -c 'import json,os,pathlib; p=pathlib.Path("dist/build-provenance.json"); v=json.loads(p.read_text()); v["inputArtifactApkSha256"]=pathlib.Path(os.environ["RUNNER_TEMP"],"rtsp-input-sha256").read_text().strip(); v["resignedWithExistingTestKey"]=True; p.write_text(json.dumps(v,indent=2)+"\n")'
           (cd dist && sha256sum RTSPMonitor-0.6.0-debug.apk apk-signature.txt PLAYBACK_RECORDING_UPDATE.md build-provenance.json > SHA256SUMS.txt)
           gh release create v0.6.0 dist/* --target d8d764bbf56a7aa10a6a577f13abf2cd0961bcec --title 'v0.6.0 - 独立回放与录像分类' --draft --prerelease --notes-file docs/RELEASE_NOTES_0.6.0.md
           gh api repos/$GH_REPO/releases > "$RUNNER_TEMP/rtsp-releases.json"
