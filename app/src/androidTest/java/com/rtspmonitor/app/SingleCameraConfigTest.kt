@@ -3,6 +3,7 @@ package com.rtspmonitor.app
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.rtspmonitor.core.*
+import com.rtspmonitor.data.Camera
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import org.junit.Assert.*
@@ -27,6 +28,19 @@ class SingleCameraConfigTest {
    assertFalse(updated.encryptedConnection.contains("test-only"))
    withContext(Dispatchers.Main) { vm.save("Invalid", "rtsp://admin:fake@192.0.2.3/stream1", "", "", true) }.join()
    assertEquals(updated, app.database.dao().cameras().first().single())
+   val legacy = Camera("legacy-camera", "Legacy", updated.encryptedConnection)
+   app.database.dao().save(legacy)
+   withContext(Dispatchers.Main) {
+    vm.selectCamera(updated)
+    app.sessions.connect(legacy)
+    app.sessions.start(legacy)
+    assertEquals(ConnectionState.DISCONNECTED, app.sessions.session(legacy.id).player.status.value.state)
+    assertNull(app.sessions.session(legacy.id).job)
+   }
+   assertEquals(2, app.database.dao().cameras().first().size)
+   val recreated = withContext(Dispatchers.Main) { MonitorViewModel(app) }
+   assertEquals(updated.id, recreated.activeId)
+   withContext(Dispatchers.Main) { recreated.localPlayer.release() }
    assertEquals(1, app.sessions.decodeLimit)
    assertEquals(1, app.sessions.recordingLimit)
   } finally {
