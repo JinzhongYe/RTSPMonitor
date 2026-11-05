@@ -79,3 +79,4 @@ jobs:
           path: |
             **/build/reports/
             **/build/test-results/
+            app/build/outputs/apk/androidTest/debug/*.apk
