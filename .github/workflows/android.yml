@@ -33,6 +33,8 @@ jobs:
         run: python3 -m unittest discover -s tools -p 'test_*.py'
       - name: Enable emulator acceleration
         run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc
+          df -h .
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
@@ -42,7 +44,7 @@ jobs:
           api-level: 35
           arch: x86_64
           profile: pixel_2
-          disk-size: 2G
+          emulator-boot-timeout: 300
           disable-animations: true
           script: |
             bash gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.app.SingleCameraConfigTest
