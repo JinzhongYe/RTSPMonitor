@@ -99,7 +99,7 @@ class RecordingForegroundService: Service() {
     val desiredRecord=flag("manual") || policy.active
     if(desiredRecord && !attempted) { attempted=true;app.sessions.start(camera) }
     if(!desiredRecord) {
-     if(session.job?.isCompleted==false) { app.sessions.stop(id);if(lastRecordState!=RecordingState.FAILED)notifyEvent("录像已保存到应用内，可在录像列表导出到相册") }
+     if(session.job?.isCompleted==false) { app.sessions.stop(id);if(session.state.value.recordingState!=RecordingState.FAILED)notifyEvent("录像已保存到应用内，可在录像列表导出到相册") }
      attempted=false
     }
     val record=session.state.value.recordingState
