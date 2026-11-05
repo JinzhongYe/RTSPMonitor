@@ -20,3 +20,7 @@ LibVLC 3.7.7 AAR SHA-256：`b48dab96e0e90e34cce3861963500c144a5aadb1b249d501d6a4
 正式发布前记录所有二进制来源、维护状态、已知漏洞与许可证义务；未完成项属于发布阻塞，不属于技术验证通过项。
 
 本地测试另用 MediaMTX v1.21.3（MIT，未打包进 App），官方发布元数据与实际下载校验和见第二阶段报告；测试用主机 FFmpeg 也未打包。
+
+## v0.5.0 检测依赖
+
+新增固定版本 `com.google.mediapipe:tasks-vision:1.2.2`，使用 CPU 在设备本地处理帧。[官方 Android 接口](https://developers.google.com/edge/mediapipe/solutions/vision/object_detector/android)。EfficientDet-Lite0 int8 v1 模型随 APK 打包，来源见 [模型说明](EFFICIENTDET_MODEL.md)，SHA-256 和 Apache-2.0 许可证随模型一起保存到应用 assets，运行时校验模型文件。此项不替代上文列出的完整分发材料审计。
