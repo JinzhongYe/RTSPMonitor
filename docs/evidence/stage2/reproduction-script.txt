@@ -1,0 +1,17 @@
+
+com.rtspmonitor.media.MediaStoreVideoTest:...
+
+Time: 0.201
+
+OK (3 tests)
+
+
+
+com.rtspmonitor.media.RtspRecordingTest:...
+
+Time: 20.835
+
+OK (3 tests)
+
+
+Artifacts: /Users/yejinzhong/Documents/RTSP/tools/vendor/spike-20261104-223549

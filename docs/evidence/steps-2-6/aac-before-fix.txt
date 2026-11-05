@@ -1,0 +1,49 @@
+
+com.rtspmonitor.media.RtspRecordingTest:
+Error in h264AacCopy(com.rtspmonitor.media.RtspRecordingTest):
+java.lang.AssertionError: AAC access units must not be dropped: 6
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.rtspmonitor.media.RtspRecordingTest$record$1.invokeSuspend(RtspRecordingTest.kt:89)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:28)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.rtspmonitor.media.RtspRecordingTest.record(RtspRecordingTest.kt:54)
+	at com.rtspmonitor.media.RtspRecordingTest.record$default(RtspRecordingTest.kt:54)
+	at com.rtspmonitor.media.RtspRecordingTest.h264AacCopy(RtspRecordingTest.kt:23)
+
+
+Time: 7.267
+There was 1 failure:
+1) h264AacCopy(com.rtspmonitor.media.RtspRecordingTest)
+java.lang.AssertionError: AAC access units must not be dropped: 6
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.rtspmonitor.media.RtspRecordingTest$record$1.invokeSuspend(RtspRecordingTest.kt:89)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:28)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:101)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.rtspmonitor.media.RtspRecordingTest.record(RtspRecordingTest.kt:54)
+	at com.rtspmonitor.media.RtspRecordingTest.record$default(RtspRecordingTest.kt:54)
+	at com.rtspmonitor.media.RtspRecordingTest.h264AacCopy(RtspRecordingTest.kt:23)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+

@@ -1,0 +1,15 @@
+.gradle/
+.kotlin/
+**/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+tools/vendor/
+media/src/main/jniLibs/
+
+__pycache__/
+auto.key
+auto.crt
+*.jks
+*.keystore

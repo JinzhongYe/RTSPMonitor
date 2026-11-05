@@ -1,0 +1,8 @@
+
+com.rtspmonitor.app.LongRecordingTest:.
+
+Time: 616.264
+
+OK (1 test)
+
+

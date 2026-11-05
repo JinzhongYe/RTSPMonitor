@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-04",
+  "android": "15 / API 35",
+  "abi": "arm64-v8a emulator",
+  "libvlc": "3.7.7",
+  "ffmpeg": "n8.0.1",
+  "mediamtx": "v1.21.3",
+  "apk_sha256": "8877766f7268106caf2b2495c9cd3a880d2060c8660654ed20ff6b1fc90526d4",
+  "fixture": "synthetic 320x240, 10fps, 60frames, no audio",
+  "jvm_tests": 7,
+  "python_tests": 7,
+  "source_dependent_tests": "Run explicitly; default skips are not counted as passes."
+}

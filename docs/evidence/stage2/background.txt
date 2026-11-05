@@ -1,0 +1,8 @@
+
+com.rtspmonitor.app.BackgroundRecordingTest:.
+
+Time: 13.391
+
+OK (1 test)
+
+

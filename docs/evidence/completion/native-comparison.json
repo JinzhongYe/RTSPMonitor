@@ -1,0 +1,46 @@
+{
+  "baselineApkSha256": "e4bfb7fa018571dbf963a535f10e098c564fefeb221e381b209fb379206c4ea5",
+  "currentApkSha256": "224614f90e627f6c2729daf5a70b3b461f994ca7eea0be5316666cd3957bca32",
+  "nativeLibraries": {
+    "lib/arm64-v8a/libandroidx.graphics.path.so": {
+      "identical": true,
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6"
+    },
+    "lib/arm64-v8a/libc++_shared.so": {
+      "identical": true,
+      "sha256": "c4c2fe5cbcb1fba0003a31fc7ab29a9bb12df6cc187ec45a806462540e83d93b"
+    },
+    "lib/arm64-v8a/libvlc.so": {
+      "identical": true,
+      "sha256": "4d5bb84df69c876da7dbc13555b9243bfc77666b2893a56252eb15af033774c4"
+    },
+    "lib/arm64-v8a/libvlcjni.so": {
+      "identical": true,
+      "sha256": "599962b01292c01156ff876e806cb95b9e249ccf704c5c2ceb56ff73e1b70f83"
+    },
+    "lib/x86_64/libandroidx.graphics.path.so": {
+      "identical": true,
+      "sha256": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0"
+    },
+    "lib/x86_64/libc++_shared.so": {
+      "identical": true,
+      "sha256": "683a1c7cd2f6829fd40bf805739166c5fce35235bf60d2c4e4a95e9f65a342ef"
+    },
+    "lib/x86_64/libvlc.so": {
+      "identical": true,
+      "sha256": "345d0030ed9568d2138fda86dd2a6df548be02149dd29dc977a29d2a482f0801"
+    },
+    "lib/x86_64/libvlcjni.so": {
+      "identical": true,
+      "sha256": "4ecfc592a1226345056cd94805acbee9d8020fafb10ab8ebc37bcad3d79a2102"
+    },
+    "lib/arm64-v8a/librtsp_recorder.so": {
+      "identical": true,
+      "sha256": "0e274f2602643fb68bb37b24f31f2ef2483263f016e9fb54deff9c765a065ad2"
+    },
+    "lib/x86_64/librtsp_recorder.so": {
+      "identical": true,
+      "sha256": "919130c10203701e06befb96acf6a3285a9e5c89170a4872f05d1bd067ff83ea"
+    }
+  }
+}

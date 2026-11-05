@@ -1,0 +1,8 @@
+
+com.rtspmonitor.app.RecoveryLifecycleTest:.
+
+Time: 14.238
+
+OK (1 test)
+
+

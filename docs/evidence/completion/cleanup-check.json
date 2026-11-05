@@ -1,0 +1,7 @@
+{
+  "installedApkMatchesDeliveredApk": true,
+  "recordingServiceRunning": false,
+  "rtspMonitorWakeLockPresent": false,
+  "wakeLockCheckScope": "Active Wake Locks section only; historical acquisition/release entries excluded",
+  "activeWakeLocks": "size=0"
+}

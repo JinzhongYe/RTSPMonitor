@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-05",
+  "apk_version": "0.3-spike",
+  "versionCode": 3,
+  "apk_sha256": "224614f90e627f6c2729daf5a70b3b461f994ca7eea0be5316666cd3957bca32",
+  "apk_bytes": 151620521,
+  "minSdk": 29,
+  "compileSdk": 37,
+  "targetSdk": 37,
+  "agp": "9.1.1",
+  "gradle": "9.3.1",
+  "kotlin": "2.2.10 (built-in)",
+  "ndk": "27.0.12077973",
+  "runtime": "Android 15 API 35 arm64 emulator",
+  "realPhonesOrCamerasConnected": false,
+  "jvm": {
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 17
+  },
+  "defaultConnectedData": {
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 3
+  },
+  "defaultConnectedMedia": {
+    "tests": 33,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 30,
+    "passed": 3
+  },
+  "explicitFixtureTests": {
+    "authentication": {
+      "passed": 4,
+      "skipped": 0
+    },
+    "playback": {
+      "passed": 6,
+      "skipped": 0
+    },
+    "notificationDenied": {
+      "passed": 1,
+      "skipped": 0
+    },
+    "notificationAllowedClass": {
+      "passed": 1,
+      "skipped": 1
+    }
+  },
+  "python": {
+    "passed": 8
+  },
+  "historicalLongRun": {
+    "version": "0.2-spike",
+    "wallClockSeconds": 616.264,
+    "repeatedOnCurrentVersion": false
+  },
+  "api37RuntimeTest": "NOT_RUN",
+  "trueENOSPC": "NOT_RUN",
+  "notes": "No physical-camera compatibility, maximum connections, thermal/power, physical hardware decode or cross-version runtime acceptance.",
+  "lint": {
+    "app": {
+      "Warning": 17
+    },
+    "core": {},
+    "data": {
+      "Warning": 7
+    },
+    "media": {
+      "Warning": 4
+    }
+  }
+}

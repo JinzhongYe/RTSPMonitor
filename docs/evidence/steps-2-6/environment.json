@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-05",
+  "apk_version": "0.2-spike",
+  "apk_sha256": "e4bfb7fa018571dbf963a535f10e098c564fefeb221e381b209fb379206c4ea5",
+  "android_runtime": "Android 15 API 35 arm64 emulator",
+  "compile_target_sdk": 36,
+  "min_sdk": 29,
+  "libvlc": "3.7.7",
+  "ffmpeg": "n8.0.1",
+  "mediamtx": "v1.21.3",
+  "jvm_tests": 17,
+  "python_tests": 8,
+  "long_run_seconds": 616.264,
+  "notes": "Real camera/phone, physical hardware decoding, ENOSPC and other OS runtimes are not validated."
+}

@@ -1,0 +1,25 @@
+./gradlew assembleDebug testDebugUnitTest lintDebug :data:connectedDebugAndroidTest :media:connectedDebugAndroidTest :app:connectedDebugAndroidTest
+Source-dependent tests without runner arguments are SKIPPED, not PASS.
+
+Starting 1 tests on RemoteHub_API_35(AVD) - 15
+
+com.rtspmonitor.app.BackgroundRecordingTest > recordsAcrossHomeAndScreenOffThenNotificationStopFinalizes[RemoteHub_API_35(AVD) - 15] [33mSKIPPED [0m
+
+Finished 2 tests on RemoteHub_API_35(AVD) - 15
+
+> Task :data:compileDebugAndroidTestJavaWithJavac NO-SOURCE
+> Task :data:dexBuilderDebugAndroidTest UP-TO-DATE
+> Task :data:mergeDebugAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :data:processDebugAndroidTestJavaRes UP-TO-DATE
+> Task :data:mergeDebugAndroidTestJavaResource UP-TO-DATE
+> Task :data:mergeProjectDexDebugAndroidTest UP-TO-DATE
+> Task :data:packageDebugAndroidTest
+> Task :data:createDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+
+> Task :data:connectedDebugAndroidTest
+Starting 2 tests on RemoteHub_API_35(AVD) - 15
+
+Finished 2 tests on RemoteHub_API_35(AVD) - 15
+
+BUILD SUCCESSFUL in 17s
+276 actionable tasks: 12 executed, 264 up-to-date

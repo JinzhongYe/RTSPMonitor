@@ -1,0 +1,28 @@
+{
+  "h264": {
+    "container": {
+      "codec": "h264",
+      "width": 320,
+      "height": 240,
+      "duration": "2.000000",
+      "video_packets": 20
+    },
+    "stream_copy": {
+      "matched_source_offset": 10,
+      "matching_vcl_nals": 20
+    }
+  },
+  "h265": {
+    "container": {
+      "codec": "hevc",
+      "width": 320,
+      "height": 240,
+      "duration": "2.000000",
+      "video_packets": 20
+    },
+    "stream_copy": {
+      "matched_source_offset": 20,
+      "matching_vcl_nals": 20
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "h264": {
+    "video": {
+      "matched_source_offset": 50,
+      "matching_vcl_nals": 20
+    },
+    "audio": {
+      "matched_source_offset": 75,
+      "matching_aac_packets": 35
+    }
+  },
+  "h265": {
+    "video": {
+      "matched_source_offset": 30,
+      "matching_vcl_nals": 20
+    },
+    "audio": {
+      "matched_source_offset": 21,
+      "matching_aac_packets": 35
+    }
+  },
+  "long": {
+    "Long-h264-0.mp4": {
+      "codec": "h264",
+      "width": 320,
+      "height": 240,
+      "duration": "300.000000",
+      "video_packets": 3000
+    },
+    "Long-h264-1.mp4": {
+      "codec": "h264",
+      "width": 320,
+      "height": 240,
+      "duration": "300.000000",
+      "video_packets": 3000
+    },
+    "Long-h264-2.mp4": {
+      "codec": "h264",
+      "width": 320,
+      "height": 240,
+      "duration": "13.200000",
+      "video_packets": 132
+    },
+    "Long-h265-0.mp4": {
+      "codec": "hevc",
+      "width": 320,
+      "height": 240,
+      "duration": "300.000000",
+      "video_packets": 3000
+    },
+    "Long-h265-1.mp4": {
+      "codec": "hevc",
+      "width": 320,
+      "height": 240,
+      "duration": "300.000000",
+      "video_packets": 3000
+    },
+    "Long-h265-2.mp4": {
+      "codec": "hevc",
+      "width": 320,
+      "height": 240,
+      "duration": "13.400000",
+      "video_packets": 134
+    }
+  }
+}

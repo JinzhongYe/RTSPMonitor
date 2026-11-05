@@ -1,0 +1,5 @@
+{
+  "syntheticCredentialLeakDetected": false,
+  "scope": "AVD logcat ring buffer after final authentication/background regressions; synthetic credentials only",
+  "linesChecked": 64967
+}

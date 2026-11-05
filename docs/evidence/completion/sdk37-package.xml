@@ -1,0 +1,25 @@
+<remotePackage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" path="platforms;android-37.0">
+    <type-details xsi:type="sdk:platformDetailsType">
+      <api-level>37.0</api-level>
+      <codename />
+      <extension-level>22</extension-level>
+      <base-extension>true</base-extension>
+      <layoutlib api="15" />
+    </type-details>
+    <revision>
+      <major>2</major>
+    </revision>
+    <display-name>Android SDK Platform 37.0</display-name>
+    <uses-license ref="android-sdk-license" />
+    <channelRef ref="channel-0" />
+    <archives>
+      <archive>
+        <complete>
+          <size>67281901</size>
+          <checksum type="sha1">ed8ebf7f8822a4de5686d427f237d2fa30ff7410</checksum>
+          <url>platform-37.0_r02.zip</url>
+        </complete>
+      </archive>
+    </archives>
+  </remotePackage>
+  

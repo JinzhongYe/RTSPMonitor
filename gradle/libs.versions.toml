@@ -1,0 +1,20 @@
+[versions]
+agp = "9.1.1"
+kotlin = "2.2.10"
+[libraries]
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version = "1.9.0" }
+vlc = { module = "org.videolan.android:libvlc-all", version = "3.7.7" }
+room = { module = "androidx.room:room-runtime", version = "2.7.2" }
+room-ktx = { module = "androidx.room:room-ktx", version = "2.7.2" }
+room-compiler = { module = "androidx.room:room-compiler", version = "2.7.2" }
+compose-bom = { module = "androidx.compose:compose-bom", version = "2024.12.01" }
+activity = { module = "androidx.activity:activity-compose", version = "1.10.1" }
+lifecycle = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version = "2.9.2" }
+junit = { module = "junit:junit", version = "4.13.2" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+legacy-kapt = { id = "com.android.legacy-kapt", version.ref = "agp" }

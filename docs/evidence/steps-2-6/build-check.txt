@@ -1,0 +1,25 @@
+./gradlew assembleDebug testDebugUnitTest lintDebug :data:connectedDebugAndroidTest :media:connectedDebugAndroidTest :app:connectedDebugAndroidTest
+Source-dependent tests without explicit arguments are SKIPPED, not PASS.
+
+Starting 8 tests on RemoteHub_API_35(AVD) - 15
+
+com.rtspmonitor.app.BackgroundRecordingTest > recordsAcrossHomeAndScreenOffThenNotificationStopFinalizes[RemoteHub_API_35(AVD) - 15] [33mSKIPPED [0m
+
+com.rtspmonitor.app.LongRecordingTest > defaultFiveMinuteSegmentsInTwoForegroundSessions[RemoteHub_API_35(AVD) - 15] [33mSKIPPED [0m
+
+com.rtspmonitor.app.PlaybackViewModelTest > publishedPlaybackSurvivesActivityRecreation[RemoteHub_API_35(AVD) - 15] [33mSKIPPED [0m
+
+com.rtspmonitor.app.RecoveryLifecycleTest > interruptedSessionReconnectsIntoNewFile[RemoteHub_API_35(AVD) - 15] [33mSKIPPED [0m
+
+com.rtspmonitor.app.RecoveryLifecycleTest > prepareProcessDeath[RemoteHub_API_35(AVD) - 15] [33mSKIPPED [0m
+
+com.rtspmonitor.app.RecoveryLifecycleTest > recoverAfterProcessDeath[RemoteHub_API_35(AVD) - 15] [33mSKIPPED [0m
+
+com.rtspmonitor.app.SessionCommandsTest > decodeQuotaAlsoAppliesToSoutProbe[RemoteHub_API_35(AVD) - 15] [33mSKIPPED [0m
+
+com.rtspmonitor.app.SessionCommandsTest > stopAndRestartAreSerialized[RemoteHub_API_35(AVD) - 15] [33mSKIPPED [0m
+
+Finished 16 tests on RemoteHub_API_35(AVD) - 15
+
+BUILD SUCCESSFUL in 16s
+276 actionable tasks: 7 executed, 269 up-to-date

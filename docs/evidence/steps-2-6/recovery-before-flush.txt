@@ -1,0 +1,39 @@
+
+com.rtspmonitor.app.RecoveryLifecycleTest:
+Error in recoverAfterProcessDeath(com.rtspmonitor.app.RecoveryLifecycleTest):
+java.lang.AssertionError: Recovered index must exist
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.rtspmonitor.app.RecoveryLifecycleTest$recoverAfterProcessDeath$1.invokeSuspend(RecoveryLifecycleTest.kt:80)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:99)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.rtspmonitor.app.RecoveryLifecycleTest.recoverAfterProcessDeath(RecoveryLifecycleTest.kt:73)
+
+
+Time: 0.076
+There was 1 failure:
+1) recoverAfterProcessDeath(com.rtspmonitor.app.RecoveryLifecycleTest)
+java.lang.AssertionError: Recovered index must exist
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.rtspmonitor.app.RecoveryLifecycleTest$recoverAfterProcessDeath$1.invokeSuspend(RecoveryLifecycleTest.kt:80)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:99)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.rtspmonitor.app.RecoveryLifecycleTest.recoverAfterProcessDeath(RecoveryLifecycleTest.kt:73)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+

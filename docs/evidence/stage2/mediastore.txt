@@ -1,0 +1,8 @@
+
+com.rtspmonitor.media.MediaStoreVideoTest:...
+
+Time: 0.256
+
+OK (3 tests)
+
+

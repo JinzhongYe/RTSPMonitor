@@ -1,0 +1,22 @@
+{
+  "h264": {
+    "video": {
+      "matched_source_offset": 30,
+      "matching_vcl_nals": 20
+    },
+    "aac": {
+      "matched_source_offset": 67,
+      "matching_aac_packets": 35
+    }
+  },
+  "h265": {
+    "video": {
+      "matched_source_offset": 50,
+      "matching_vcl_nals": 20
+    },
+    "aac": {
+      "matched_source_offset": 8,
+      "matching_aac_packets": 30
+    }
+  }
+}

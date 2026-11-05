@@ -1,0 +1,108 @@
+
+com.rtspmonitor.media.PlaybackTest:
+Error in publishedH264Plays(com.rtspmonitor.media.PlaybackTest):
+java.lang.AssertionError: Playback state: PlayerStatus(state=ERROR, info=, error=播放连接失败，请检查地址、认证及编码)
+	at com.rtspmonitor.media.PlaybackTest$play$1.invokeSuspend(PlaybackTest.kt:39)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:28)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:99)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.rtspmonitor.media.PlaybackTest.play(PlaybackTest.kt:21)
+	at com.rtspmonitor.media.PlaybackTest.publishedH264Plays(PlaybackTest.kt:19)
+	... 32 trimmed
+Caused by: kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 20000 ms
+	at kotlinx.coroutines.TimeoutKt.TimeoutCancellationException(Timeout.kt:188)
+	at kotlinx.coroutines.TimeoutCoroutine.run(Timeout.kt:156)
+	at kotlinx.coroutines.EventLoopImplBase$DelayedRunnableTask.run(EventLoop.common.kt:505)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.DefaultExecutor.run(DefaultExecutor.kt:105)
+	at java.lang.Thread.run(Thread.java:1012)
+
+Error in publishedH265Plays(com.rtspmonitor.media.PlaybackTest):
+java.lang.AssertionError: Playback state: PlayerStatus(state=ERROR, info=, error=播放连接失败，请检查地址、认证及编码)
+	at com.rtspmonitor.media.PlaybackTest$play$1.invokeSuspend(PlaybackTest.kt:39)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:28)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:99)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.rtspmonitor.media.PlaybackTest.play(PlaybackTest.kt:21)
+	at com.rtspmonitor.media.PlaybackTest.publishedH265Plays(PlaybackTest.kt:20)
+	... 32 trimmed
+Caused by: kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 20000 ms
+	at kotlinx.coroutines.TimeoutKt.TimeoutCancellationException(Timeout.kt:188)
+	at kotlinx.coroutines.TimeoutCoroutine.run(Timeout.kt:156)
+	at kotlinx.coroutines.EventLoopImplBase$DelayedRunnableTask.run(EventLoop.common.kt:505)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.DefaultExecutor.run(DefaultExecutor.kt:105)
+	at java.lang.Thread.run(Thread.java:1012)
+
+
+Time: 42.466
+There were 2 failures:
+1) publishedH264Plays(com.rtspmonitor.media.PlaybackTest)
+java.lang.AssertionError: Playback state: PlayerStatus(state=ERROR, info=, error=播放连接失败，请检查地址、认证及编码)
+	at com.rtspmonitor.media.PlaybackTest$play$1.invokeSuspend(PlaybackTest.kt:39)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:28)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:99)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.rtspmonitor.media.PlaybackTest.play(PlaybackTest.kt:21)
+	at com.rtspmonitor.media.PlaybackTest.publishedH264Plays(PlaybackTest.kt:19)
+	... 32 trimmed
+Caused by: kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 20000 ms
+	at kotlinx.coroutines.TimeoutKt.TimeoutCancellationException(Timeout.kt:188)
+	at kotlinx.coroutines.TimeoutCoroutine.run(Timeout.kt:156)
+	at kotlinx.coroutines.EventLoopImplBase$DelayedRunnableTask.run(EventLoop.common.kt:505)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.DefaultExecutor.run(DefaultExecutor.kt:105)
+	at java.lang.Thread.run(Thread.java:1012)
+2) publishedH265Plays(com.rtspmonitor.media.PlaybackTest)
+java.lang.AssertionError: Playback state: PlayerStatus(state=ERROR, info=, error=播放连接失败，请检查地址、认证及编码)
+	at com.rtspmonitor.media.PlaybackTest$play$1.invokeSuspend(PlaybackTest.kt:39)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:28)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:99)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:95)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:69)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:47)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.rtspmonitor.media.PlaybackTest.play(PlaybackTest.kt:21)
+	at com.rtspmonitor.media.PlaybackTest.publishedH265Plays(PlaybackTest.kt:20)
+	... 32 trimmed
+Caused by: kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 20000 ms
+	at kotlinx.coroutines.TimeoutKt.TimeoutCancellationException(Timeout.kt:188)
+	at kotlinx.coroutines.TimeoutCoroutine.run(Timeout.kt:156)
+	at kotlinx.coroutines.EventLoopImplBase$DelayedRunnableTask.run(EventLoop.common.kt:505)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.DefaultExecutor.run(DefaultExecutor.kt:105)
+	at java.lang.Thread.run(Thread.java:1012)
+
+FAILURES!!!
+Tests run: 2,  Failures: 2
+
+

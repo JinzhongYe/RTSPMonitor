@@ -1,0 +1,8 @@
+
+com.rtspmonitor.media.AuthenticationTest:....
+
+Time: 11.243
+
+OK (4 tests)
+
+

@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuites tests="33" failures="0" errors="0" skipped="30" time="0.458" timestamp="2026-11-05T02:32:51" hostname="localhost">
+  <testsuite name="com.rtspmonitor.media.AudioFixtureTest" tests="1" failures="0" errors="0" skipped="1" time="0.005" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="generateSyntheticAac" classname="com.rtspmonitor.media.AudioFixtureTest" time="0.005">
+      <skipped />
+    </testcase>
+  </testsuite>
+  <testsuite name="com.rtspmonitor.media.AuthenticationTest" tests="4" failures="0" errors="0" skipped="4" time="0.008" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="recorderRejectsWrongPassword" classname="com.rtspmonitor.media.AuthenticationTest" time="0.004">
+      <skipped />
+    </testcase>
+    <testcase name="playerRejectsWrongPassword" classname="com.rtspmonitor.media.AuthenticationTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="recorderAcceptsSpecialCharacters" classname="com.rtspmonitor.media.AuthenticationTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="playerAcceptsSpecialCharacters" classname="com.rtspmonitor.media.AuthenticationTest" time="0.002">
+      <skipped />
+    </testcase>
+  </testsuite>
+  <testsuite name="com.rtspmonitor.media.FixtureTest" tests="2" failures="0" errors="0" skipped="2" time="0.002" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="generateH264" classname="com.rtspmonitor.media.FixtureTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="generateH265" classname="com.rtspmonitor.media.FixtureTest" time="0.001">
+      <skipped />
+    </testcase>
+  </testsuite>
+  <testsuite name="com.rtspmonitor.media.MediaStoreVideoTest" tests="4" failures="0" errors="0" skipped="3" time="0.034" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="h265PublishAndDelete" classname="com.rtspmonitor.media.MediaStoreVideoTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="longFragmentedMp4Publishes" classname="com.rtspmonitor.media.MediaStoreVideoTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="h264PublishAndDelete" classname="com.rtspmonitor.media.MediaStoreVideoTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="invalidContainerIsNotPublished" classname="com.rtspmonitor.media.MediaStoreVideoTest" time="0.031" />
+  </testsuite>
+  <testsuite name="com.rtspmonitor.media.NativeTest" tests="1" failures="0" errors="0" skipped="0" time="0.001" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="failedConnectionReturnsAndReleasesNativeHandle" classname="com.rtspmonitor.media.NativeTest" time="0.001" />
+  </testsuite>
+  <testsuite name="com.rtspmonitor.media.PlaybackTest" tests="6" failures="0" errors="0" skipped="6" time="0.011" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="publishedH264Plays" classname="com.rtspmonitor.media.PlaybackTest" time="0.002">
+      <skipped />
+    </testcase>
+    <testcase name="publishedH265Plays" classname="com.rtspmonitor.media.PlaybackTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="h264Tcp" classname="com.rtspmonitor.media.PlaybackTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="h264Udp" classname="com.rtspmonitor.media.PlaybackTest" time="0.003">
+      <skipped />
+    </testcase>
+    <testcase name="h265Tcp" classname="com.rtspmonitor.media.PlaybackTest" time="0.002">
+      <skipped />
+    </testcase>
+    <testcase name="h265Udp" classname="com.rtspmonitor.media.PlaybackTest" time="0.002">
+      <skipped />
+    </testcase>
+  </testsuite>
+  <testsuite name="com.rtspmonitor.media.RecoveryTest" tests="2" failures="0" errors="0" skipped="1" time="0.003" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="incompleteFinalFragmentIsTrimmedBeforePublication" classname="com.rtspmonitor.media.RecoveryTest" time="0.002">
+      <skipped />
+    </testcase>
+    <testcase name="unrecoverableHeaderIsRetained" classname="com.rtspmonitor.media.RecoveryTest" time="0.001" />
+  </testsuite>
+  <testsuite name="com.rtspmonitor.media.RtspRecordingTest" tests="8" failures="0" errors="0" skipped="8" time="0.01" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="h264AacCopy" classname="com.rtspmonitor.media.RtspRecordingTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="h264Tcp" classname="com.rtspmonitor.media.RtspRecordingTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="h264Udp" classname="com.rtspmonitor.media.RtspRecordingTest" time="0.002">
+      <skipped />
+    </testcase>
+    <testcase name="h265Tcp" classname="com.rtspmonitor.media.RtspRecordingTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="h265Udp" classname="com.rtspmonitor.media.RtspRecordingTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="alawIsDroppedWithWarning" classname="com.rtspmonitor.media.RtspRecordingTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="h265AacCopy" classname="com.rtspmonitor.media.RtspRecordingTest" time="0.002">
+      <skipped />
+    </testcase>
+    <testcase name="twoRecordersRemainIndependentWhenOneStops" classname="com.rtspmonitor.media.RtspRecordingTest" time="0.001">
+      <skipped />
+    </testcase>
+  </testsuite>
+  <testsuite name="com.rtspmonitor.media.VlcProbeTest" tests="4" failures="0" errors="0" skipped="4" time="0.007" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="h264LiveRecord" classname="com.rtspmonitor.media.VlcProbeTest" time="0.002">
+      <skipped />
+    </testcase>
+    <testcase name="h264Sout" classname="com.rtspmonitor.media.VlcProbeTest" time="0.001">
+      <skipped />
+    </testcase>
+    <testcase name="h265Sout" classname="com.rtspmonitor.media.VlcProbeTest" time="0.002">
+      <skipped />
+    </testcase>
+    <testcase name="h265LiveRecord" classname="com.rtspmonitor.media.VlcProbeTest" time="0.002">
+      <skipped />
+    </testcase>
+  </testsuite>
+  <testsuite name="com.rtspmonitor.media.WriteFailureTest" tests="1" failures="0" errors="0" skipped="1" time="0.001" timestamp="2026-11-05T02:32:51" hostname="localhost">
+    <properties>
+      <property name="device" value="RemoteHub_API_35(AVD) - 15" />
+      <property name="flavor" value="" />
+      <property name="project" value=":media" />
+    </properties>
+    <testcase name="rejectedOutputDoesNotPublishPartialFile" classname="com.rtspmonitor.media.WriteFailureTest" time="0.001">
+      <skipped />
+    </testcase>
+  </testsuite>
+</testsuites>
