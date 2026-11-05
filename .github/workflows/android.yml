@@ -42,6 +42,7 @@ jobs:
           api-level: 35
           arch: x86_64
           profile: pixel_2
+          disk-size: 2G
           disable-animations: true
           script: |
             bash gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.app.SingleCameraConfigTest
