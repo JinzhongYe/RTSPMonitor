@@ -246,7 +246,7 @@ class MainActivity: ComponentActivity() {
 private fun connectionLabel(state: ConnectionState) = when(state) {
  ConnectionState.DISCONNECTED -> "未连接"; ConnectionState.CONNECTING -> "连接中"; ConnectionState.CONNECTED -> "已连接"; ConnectionState.RECONNECTING -> "重连中"; ConnectionState.ERROR -> "连接失败"
 }
-private fun recordingLabel(state: RecordingState) = when(state) {
+internal fun recordingLabel(state: RecordingState) = when(state) {
  RecordingState.IDLE -> "未录像"; RecordingState.PREPARING -> "准备中"; RecordingState.RECORDING -> "正在录像"; RecordingState.FINALIZING -> "保存中"; RecordingState.INTERRUPTED -> "等待重连"; RecordingState.FAILED -> "录像失败"
 }
 private fun playerView(context: android.content.Context, player: VlcPlayer): android.view.View = com.rtspmonitor.media.createVideoView(context, player)

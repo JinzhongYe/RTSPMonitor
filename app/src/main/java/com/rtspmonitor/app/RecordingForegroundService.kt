@@ -116,7 +116,7 @@ class RecordingForegroundService: Service() {
      wakeLock?.let { if(it.isHeld)it.release() }
      wakeLock=getSystemService(PowerManager::class.java).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"RTSPMonitor:monitor").apply { acquire(600000) };lastLock=now
     }
-    getSystemService(NotificationManager::class.java).notify(1,notification("${if(flag("auto")) "自动监控中" else "监控运行中"} · ${if(desiredRecord) "录像中" else "等待活动"}"))
+    getSystemService(NotificationManager::class.java).notify(1,notification("${if(flag("auto")) "自动监控中" else "监控运行中"} · ${recordingLabel(record)}"))
     delay(500)
    }
   } finally {
