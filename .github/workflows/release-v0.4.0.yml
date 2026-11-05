@@ -1,0 +1,19 @@
+name: Publish v0.4.0
+on: workflow_dispatch
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: JinzhongYe/RTSPMonitor
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish verified build
+        run: |
+          test "$(gh api repos/$GH_REPO/actions/runs/41971895381 --jq .conclusion)" = success
+          gh run download 41971895381 --name RTSPMonitor-0.4.0 --dir dist
+          cd dist && sha256sum --check SHA256SUMS.txt && cd ..
+          gh release create v0.4.0 dist/* --target ca3624392ca5fc4dad83f795b7b5af6a5d8bf882 --title 'v0.4.0 - 单路摄像头监控' --prerelease --notes-file docs/RELEASE_NOTES_0.4.0.md
