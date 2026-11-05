@@ -11,6 +11,30 @@ import org.junit.Assert.*
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class) class StoreTest {
+ @Test fun deletingPrivateVideoCleansFailedPendingExport()=runBlocking {
+  val context=InstrumentationRegistry.getInstrumentation().targetContext
+  val db=Room.inMemoryDatabaseBuilder(context,MonitorDatabase::class.java).build()
+  val folder=java.io.File(context.noBackupFilesDir,"videos").apply { mkdirs() }
+  val file=java.io.File(folder,"delete-${java.util.UUID.randomUUID()}.mp4").apply { writeText("private test fixture") }
+  val journal=java.io.File(file.path+".export-uri")
+  val resolver=context.contentResolver
+  val uri=resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,ContentValues().apply {
+   put(MediaStore.MediaColumns.DISPLAY_NAME,file.name)
+   put(MediaStore.MediaColumns.MIME_TYPE,"video/mp4")
+   put(MediaStore.MediaColumns.RELATIVE_PATH,"DCIM/RTSPMonitor/")
+   put(MediaStore.MediaColumns.IS_PENDING,1)
+  })!!
+  try {
+   journal.writeText(uri.toString())
+   val item=Recording(android.net.Uri.fromFile(file).toString(),"test",file.name,0)
+   db.dao().save(item)
+   VideoStore(context,db.dao()).delete(item)
+   assertFalse(file.exists());assertFalse(journal.exists())
+   assertTrue(db.dao().recordings().first().isEmpty())
+   val exists=resolver.query(uri,arrayOf(MediaStore.MediaColumns._ID),null,null,null)?.use { it.moveToFirst() } ?: false
+   assertFalse(exists)
+  } finally { file.delete();journal.delete();resolver.delete(uri,null,null);db.close() }
+ }
  @Test fun orphanPendingRowsAndMissingPublishedIndexesAreReconciled() = runBlocking {
   val context = InstrumentationRegistry.getInstrumentation().targetContext
   val db = Room.inMemoryDatabaseBuilder(context, MonitorDatabase::class.java).build()
