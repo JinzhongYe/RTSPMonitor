@@ -43,10 +43,9 @@ jobs:
           disable-animations: true
           script: |
             bash gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.app.SingleCameraConfigTest
-            adb shell am start -W -n com.rtspmonitor.app/.MainActivity
             adb shell pm grant com.rtspmonitor.app android.permission.POST_NOTIFICATIONS
+            adb shell am start -W -n com.rtspmonitor.app/.MainActivity
             sleep 3
-            adb shell input keyevent KEYCODE_BACK
             adb shell screencap -p /sdcard/screen.png
             adb pull /sdcard/screen.png app/build/reports/screen.png
       - name: Package

@@ -67,6 +67,7 @@ class CameraSessionManager(private val app: MonitorApp) {
   if(!allowedCamera(camera.id)) return
   val s = session(camera.id)
   s.commands.withLock {
+  if(!allowedCamera(camera.id)) return@withLock
   if(s.removed || s.job?.isCompleted == false) return@withLock
   if(sessions.values.count { it.job?.isCompleted == false } >= recordingLimit) { message.value = "已达到并发录像配额"; return@withLock }
   s.job = scope.launch {
