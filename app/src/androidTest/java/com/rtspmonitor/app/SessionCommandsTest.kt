@@ -44,18 +44,15 @@ import java.util.UUID
   assumeTrue(base!=null)
   val app=InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as MonitorApp
   val cameras=listOf("first","second").map { Camera(UUID.randomUUID().toString(),it,app.vault.encrypt(Connection("$base/h264","","",Transport.TCP))) }
-  val limit=app.sessions.decodeLimit
   cameras.forEach { app.database.dao().save(it) }
   try {
    withContext(Dispatchers.Main) {
-    app.sessions.decodeLimit=1
     app.sessions.connect(cameras[0]); app.sessions.connect(cameras[1]); app.sessions.probe(cameras[1])
     assertEquals(ConnectionState.DISCONNECTED,app.sessions.session(cameras[1].id).player.status.value.state)
     assertTrue(app.sessions.message.value.contains("配额"))
    }
   } finally {
    withContext(Dispatchers.Main) { cameras.forEach { app.sessions.remove(it) } }
-   app.sessions.decodeLimit=limit
   }
  }
 

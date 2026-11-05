@@ -19,16 +19,14 @@ import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class LongRecordingTest {
-    @Test fun defaultFiveMinuteSegmentsInTwoForegroundSessions() = runBlocking {
+    @Test fun defaultFiveMinuteSegmentsInOneForegroundSession() = runBlocking {
         val args = InstrumentationRegistry.getArguments()
         assumeTrue(args.getString("longRecording") == "true" && args.getString("rtspBase") != null)
         val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as MonitorApp
-        val cameras = listOf("h264", "h265").map { codec -> Camera(UUID.randomUUID().toString(), "Long-$codec", app.vault.encrypt(Connection("${args.getString("rtspBase")}/$codec", "", "", Transport.TCP))) }
-        val oldLimit = app.sessions.recordingLimit
+        val cameras = listOf("h264").map { codec -> Camera(UUID.randomUUID().toString(), "Long-$codec", app.vault.encrypt(Connection("${args.getString("rtspBase")}/$codec", "", "", Transport.TCP))) }
         cameras.forEach { app.database.dao().save(it) }
         val evidence = org.json.JSONArray()
         try {
-            app.sessions.recordingLimit = 2
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
                 cameras.forEach { camera -> scenario.onActivity { it.command("START", camera.id) } }
                 withTimeout(30_000) { while(cameras.any { app.sessions.states.value[it.id]?.recordingState != RecordingState.RECORDING }) delay(100) }
@@ -66,7 +64,6 @@ class LongRecordingTest {
             shell("input keyevent KEYCODE_WAKEUP"); shell("wm dismiss-keyguard")
             withContext(Dispatchers.Main) { cameras.forEach { app.sessions.remove(it) } }
             app.database.dao().recordings().first().filter { video -> cameras.any { it.id == video.cameraId } }.forEach { app.store.delete(it) }
-            app.sessions.recordingLimit=oldLimit
         }
     }
     private fun shell(command: String) {

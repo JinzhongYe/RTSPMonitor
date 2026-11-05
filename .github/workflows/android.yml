@@ -1,0 +1,68 @@
+name: Android build
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android toolchain
+        run: sdkmanager 'platforms;android-37' 'build-tools;37.0.0' 'ndk;27.0.12077973'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Restore persistent test signing key
+        env:
+          DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
+        run: |
+          test -n "$DEBUG_KEYSTORE"
+          mkdir -p ~/.android
+          printf '%s' "$DEBUG_KEYSTORE" | base64 --decode > ~/.android/debug.keystore
+      - name: Build and check
+        run: bash gradlew assembleDebug testDebugUnitTest lintDebug :app:assembleDebugAndroidTest
+      - name: Python checks
+        run: python3 -m unittest discover -s tools -p 'test_*.py'
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Configuration regression and UI smoke check
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            bash gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.app.SingleCameraConfigTest
+            adb shell am start -W -n com.rtspmonitor.app/.MainActivity
+            adb shell pm grant com.rtspmonitor.app android.permission.POST_NOTIFICATIONS
+            sleep 3
+            adb shell input keyevent KEYCODE_BACK
+            adb shell screencap -p /sdcard/screen.png
+            adb pull /sdcard/screen.png app/build/reports/screen.png
+      - name: Package
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk dist/RTSPMonitor-0.4.0-debug.apk
+          "$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --print-certs dist/*.apk > dist/apk-signature.txt
+          cd dist && sha256sum *.apk > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RTSPMonitor-0.4.0
+          path: dist/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: check-reports
+          path: |
+            **/build/reports/
+            **/build/test-results/

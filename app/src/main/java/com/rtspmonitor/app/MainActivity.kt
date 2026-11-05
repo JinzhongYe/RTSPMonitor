@@ -4,18 +4,23 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -26,6 +31,7 @@ import com.rtspmonitor.core.*
 import com.rtspmonitor.data.*
 import com.rtspmonitor.media.VlcPlayer
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import java.util.UUID
 
 class MonitorViewModel(application: android.app.Application): AndroidViewModel(application) {
@@ -40,13 +46,37 @@ class MonitorViewModel(application: android.app.Application): AndroidViewModel(a
  override fun onCleared() { localPlayer.release(); super.onCleared() }
  val ready = mutableStateOf(false)
  init { viewModelScope.launch { app.sessions.recover(); ready.value = true } }
- fun save(name: String, url: String, user: String, password: String, tcp: Boolean) = viewModelScope.launch {
-  runCatching {
-   val uri = java.net.URI(url)
-   require(!uri.host.isNullOrBlank() && uri.fragment == null) { "地址无效" }
-   val c = Connection(url, user, password, if(tcp) Transport.TCP else Transport.UDP)
-   app.database.dao().save(Camera(UUID.randomUUID().toString(), name.ifBlank { "Camera" }, app.vault.encrypt(c)))
-  }.onFailure { app.sessions.message.value = "保存失败，请检查 RTSP 地址或 Keystore" }
+ val preferences = app.getSharedPreferences("monitor", android.content.Context.MODE_PRIVATE)
+ var activeId by mutableStateOf(preferences.getString("active_camera", null))
+  private set
+ var saving by mutableStateOf(false)
+  private set
+ fun selectCamera(camera: Camera) {
+  preferences.edit().putString("active_camera", camera.id).apply()
+  activeId = camera.id
+ }
+ fun connection(camera: Camera): Connection? = runCatching { app.vault.decrypt(camera.encryptedConnection) }.getOrNull()
+ fun save(name: String, url: String, user: String, password: String, tcp: Boolean, done: () -> Unit = {}) = viewModelScope.launch {
+  if(saving) return@launch
+  saving = true
+  try {
+   val uri = java.net.URI(url.trim())
+   require(uri.rawUserInfo == null) { "请在用户名和密码栏填写凭据" }
+   val c = Connection(url.trim(), user, password, if(tcp) Transport.TCP else Transport.UDP)
+   val existing = app.database.dao().cameras().first()
+   val old = existing.firstOrNull { it.id == activeId } ?: existing.singleOrNull()
+   require(old != null || existing.isEmpty()) { "请先选择使用的摄像头" }
+   val encrypted = app.vault.encrypt(c)
+   if(old != null) { app.sessions.stop(old.id); app.sessions.disconnect(old.id) }
+   val camera = Camera(old?.id ?: UUID.randomUUID().toString(), name.ifBlank { "我的摄像头" }, encrypted)
+   app.database.dao().save(camera)
+   selectCamera(camera)
+   app.sessions.message.value = "设置已加密保存"
+   done()
+  } catch(e: Exception) {
+   if(e is kotlinx.coroutines.CancellationException) throw e
+   app.sessions.message.value = "保存失败，请检查地址、独立凭据或 Keystore"
+  } finally { saving = false }
  }
  fun cleanup() = viewModelScope.launch { app.sessions.cleanupDamaged() }
  fun remove(c: Camera) = viewModelScope.launch { app.sessions.remove(c) }
@@ -69,7 +99,7 @@ class MainActivity: ComponentActivity() {
   super.onCreate(savedInstanceState)
   enableEdgeToEdge()
   if(Build.VERSION.SDK_INT >= 33) notifications.launch(Manifest.permission.POST_NOTIFICATIONS)
-  setContent { MaterialTheme { Surface { MonitorScreen() } } }
+  setContent { MaterialTheme(colorScheme = lightColorScheme(primary = Color(0xFF126B62), background = Color(0xFFF3F6F8))) { Surface { MonitorScreen() } } }
  }
  fun command(action: String, id: String) {
   if(action == "START") withNetworkPermission { sendCommand(action, id) } else sendCommand(action, id)
@@ -85,74 +115,102 @@ class MainActivity: ComponentActivity() {
  val recordings by vm.recordings.collectAsState(initial = emptyList())
  val states by vm.app.sessions.states.collectAsState()
  val message by vm.app.sessions.message.collectAsState()
- var selected by rememberSaveable { mutableStateOf<String?>(null) }
- var name by remember { mutableStateOf("") }; var url by remember { mutableStateOf("") }
- var user by remember { mutableStateOf("") }; var password by remember { mutableStateOf("") }
- var tcp by remember { mutableStateOf(true) }; var full by rememberSaveable { mutableStateOf(false) }
+ val camera = cameras.firstOrNull { it.id == vm.activeId } ?: cameras.singleOrNull()
+ LaunchedEffect(camera?.id) { if(camera != null && vm.activeId != camera.id) vm.selectCamera(camera) }
+ var settings by rememberSaveable { mutableStateOf(false) }
+ var full by rememberSaveable { mutableStateOf(false) }
+ var deleting by remember { mutableStateOf<Recording?>(null) }
  val local = vm.localUri
- val localPlayer = vm.localPlayer
- val player = if(local != null) localPlayer else selected?.let { vm.app.sessions.session(it).player }
+ val player = if(local != null) vm.localPlayer else camera?.let { vm.app.sessions.session(it.id).player }
+ val state = camera?.let { states[it.id] } ?: SessionStatus()
+ val busy = state.recordingState in listOf(RecordingState.PREPARING, RecordingState.RECORDING, RecordingState.FINALIZING, RecordingState.INTERRUPTED)
+ fun exitFull() { full = false; activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED }
+ BackHandler(full) { exitFull() }
  if(full && player != null) {
-  Box(Modifier.fillMaxSize().safeDrawingPadding()) {
-   key(player) { AndroidView(factory={ context -> playerView(context, player) }, modifier=Modifier.fillMaxSize(), onRelease={ player.detach(it) }) }
-   Button(onClick={ full=false; activity.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED }, modifier=Modifier.align(androidx.compose.ui.Alignment.TopEnd)) { Text("退出全屏") }
+  Box(Modifier.fillMaxSize().background(Color.Black).safeDrawingPadding()) {
+   key(player) { AndroidView(factory={ playerView(it, player) }, modifier=Modifier.fillMaxSize(), onRelease={ player.detach(it) }) }
+   Button(onClick={ exitFull() }, modifier=Modifier.align(Alignment.TopEnd)) { Text("退出全屏") }
   }
-  return
+ } else {
+  LazyColumn(Modifier.fillMaxSize().safeDrawingPadding().imePadding(), contentPadding=PaddingValues(20.dp), verticalArrangement=Arrangement.spacedBy(16.dp)) {
+   item {
+    Row(Modifier.fillMaxWidth(), verticalAlignment=Alignment.CenterVertically, horizontalArrangement=Arrangement.SpaceBetween) {
+     Column { Text("RTSP Monitor", style=MaterialTheme.typography.headlineSmall); Text(camera?.name ?: "单路监控", style=MaterialTheme.typography.bodyMedium) }
+     TextButton(enabled=vm.ready.value && !vm.saving && (camera != null || cameras.isEmpty()), onClick={ settings=true }) { Text("设置") }
+    }
+   }
+   if(camera == null && cameras.size > 1) item {
+    Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
+     Text("选择本机使用的摄像头", style=MaterialTheme.typography.titleMedium)
+     Text("旧设备和历史录像将保留，选择后使用单路监控。")
+     cameras.forEach { c -> TextButton(onClick={ vm.selectCamera(c) }) { Text(c.name) } }
+    } }
+   }
+   item {
+    Card(Modifier.fillMaxWidth()) {
+     Box(Modifier.fillMaxWidth().aspectRatio(16f/9f).background(Color.Black), contentAlignment=Alignment.Center) {
+      if(player != null) key(player) { AndroidView(factory={ playerView(it, player) }, modifier=Modifier.fillMaxSize(), onRelease={ player.detach(it) }) }
+      if(local == null && state.connectionState == ConnectionState.DISCONNECTED) Text(if(camera == null) "请先配置摄像头" else "点击连接，查看实时画面", color=Color.White)
+     }
+     Column(Modifier.padding(16.dp), verticalArrangement=Arrangement.spacedBy(8.dp)) {
+      Text(if(local != null) "正在回放录像" else "预览 · ${connectionLabel(state.connectionState)}", style=MaterialTheme.typography.titleMedium)
+      Text("录像 · ${recordingLabel(state.recordingState)}" + if(state.reconnectCount > 0) " · 重连 ${state.reconnectCount} 次" else "")
+      state.lastError?.let { Text(it, color=MaterialTheme.colorScheme.error) }
+      Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+       Button(enabled=camera != null && vm.ready.value && !vm.saving, onClick={ camera?.let { vm.closeRecording(); activity.withNetworkPermission { vm.app.sessions.connect(it) } } }) { Text("连接") }
+       OutlinedButton(enabled=camera != null && !vm.saving, onClick={ camera?.let { vm.app.sessions.disconnect(it.id) } }) { Text("断开") }
+       TextButton(enabled=player != null, onClick={ full=true; activity.requestedOrientation=ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE }) { Text("全屏") }
+      }
+      Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+       Button(enabled=camera != null && vm.ready.value && !busy && !vm.saving, onClick={ camera?.let { activity.command("START",it.id) } }) { Text("开始录像") }
+       OutlinedButton(enabled=busy && !vm.saving, onClick={ camera?.let { activity.command("STOP",it.id) } }) { Text("停止录像") }
+      }
+      if(local != null) TextButton(onClick={ vm.closeRecording() }) { Text("返回实时监控") }
+      if(camera == null && cameras.isEmpty()) Button(enabled=vm.ready.value, onClick={ settings=true }) { Text("配置摄像头") }
+     }
+    }
+   }
+   if(message.isNotEmpty()) item { Text(message, style=MaterialTheme.typography.bodyMedium) }
+   item { Text("录像 (${recordings.size})", style=MaterialTheme.typography.titleLarge) }
+   if(recordings.isEmpty()) item { Text("暂无录像，开始录像后会自动分段保存。") }
+   items(recordings, key={ it.uri }) { r ->
+    OutlinedCard(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
+     Text(r.name, style=MaterialTheme.typography.titleSmall)
+     Text(java.text.DateFormat.getDateTimeInstance().format(java.util.Date(r.createdAt)), style=MaterialTheme.typography.bodySmall)
+     Row {
+      TextButton(onClick={ vm.playRecording(r.uri) }) { Text("回放") }
+      TextButton(onClick={ deleting=r }) { Text("删除") }
+     }
+    } }
+   }
+   item { TextButton(enabled=!busy, onClick={ vm.cleanup() }) { Text("清理损坏的临时录像") } }
+  }
  }
- Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding().padding(12.dp).verticalScroll(rememberScrollState())) {
-  Text("RTSP Monitor · 技术验证", style = MaterialTheme.typography.titleLarge)
-  Text("录像为独立连接；sout 尚待实机验证。硬解请求不等于硬解实测通过。")
-  if(message.isNotEmpty()) Text(message, color = MaterialTheme.colorScheme.error)
-  if(player != null) {
-   key(player) { VideoView(player, if(full) 320 else 220) }
-   val status by player.status.collectAsState()
-   Text("${status.state} ${status.info} ${status.error ?: ""}")
-   Button(onClick = { full = !full; activity.requestedOrientation = if(full) ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED }) { Text(if(full) "退出全屏" else "横屏全屏") }
+ if(settings) CameraSettings(vm, camera) { settings=false }
+ deleting?.let { r -> AlertDialog(onDismissRequest={ deleting=null }, title={ Text("删除录像？") }, text={ Text("删除后无法恢复。") }, confirmButton={ TextButton(onClick={ if(local==r.uri) vm.closeRecording(); vm.delete(r); deleting=null }) { Text("删除") } }, dismissButton={ TextButton(onClick={ deleting=null }) { Text("取消") } }) }
+}
+@Composable private fun CameraSettings(vm: MonitorViewModel, camera: Camera?, dismiss: () -> Unit) {
+ val connection = remember(camera) { camera?.let { vm.connection(it) } }
+ var name by remember { mutableStateOf(camera?.name ?: "我的摄像头") }
+ var url by remember { mutableStateOf(connection?.url ?: "rtsp://192.168.0.210:554/stream1") }
+ var user by remember { mutableStateOf(connection?.username ?: "admin") }
+ var password by remember { mutableStateOf("") }
+ var tcp by remember { mutableStateOf(connection?.transport != Transport.UDP) }
+ AlertDialog(onDismissRequest={ if(!vm.saving) dismiss() }, title={ Text("摄像头设置") }, text={
+  Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement=Arrangement.spacedBy(8.dp)) {
+   OutlinedTextField(name, {name=it}, label={Text("设备名称")}, singleLine=true)
+   OutlinedTextField(url, {url=it}, label={Text("RTSP 地址（不含密码）")}, singleLine=true)
+   OutlinedTextField(user, {user=it}, label={Text("用户名")}, singleLine=true)
+   OutlinedTextField(password, {password=it}, label={Text(if(connection != null) "密码（留空保留）" else "密码")}, visualTransformation=PasswordVisualTransformation(), singleLine=true)
+   Row(verticalAlignment=Alignment.CenterVertically) { Checkbox(tcp, {tcp=it}); Text(if(tcp) "TCP · 稳定传输" else "UDP") }
+   Text("凭据仅在本机加密保存。保存设置会先停止预览与录像。", style=MaterialTheme.typography.bodySmall)
   }
-  if(!full) {
-   OutlinedTextField(name, { name=it }, label={ Text("设备名称") }, modifier=Modifier.fillMaxWidth())
-   OutlinedTextField(url, { url=it }, label={ Text("RTSP URL") }, modifier=Modifier.fillMaxWidth(), singleLine=true)
-   OutlinedTextField(user, { user=it }, label={ Text("用户名") }, singleLine=true)
-   OutlinedTextField(password, { password=it }, label={ Text("密码") }, visualTransformation=PasswordVisualTransformation(), singleLine=true)
-   Row { Checkbox(tcp, {tcp=it}); Text(if(tcp) "TCP" else "UDP") }
-   Button(enabled=vm.ready.value, onClick={ vm.save(name,url,user,password,tcp); user=""; password=""; url="" }) { Text("添加并加密保存") }
-   Row {
-    Text("并发测试配额")
-    TextButton(onClick={ vm.app.sessions.decodeLimit++; vm.app.sessions.recordingLimit++; vm.app.sessions.message.value="配额：${vm.app.sessions.decodeLimit}；请监测温度和带宽" }) { Text("增加一路") }
-    TextButton(onClick={ vm.app.sessions.decodeLimit=1; vm.app.sessions.recordingLimit=1 }) { Text("恢复 1 路") }
-   }
-   cameras.forEach { c ->
-    val state = states[c.id] ?: SessionStatus()
-    HorizontalDivider(); Text(c.name, style=MaterialTheme.typography.titleMedium)
-    Text("${state.connectionState} / ${state.recordingState}；重连 ${state.reconnectCount}")
-    state.lastError?.let { Text(it) }
-    Row {
-     TextButton(onClick={ vm.closeRecording(); selected=c.id; activity.withNetworkPermission { vm.app.sessions.connect(c) } }) { Text("连接") }
-     TextButton(onClick={ vm.app.sessions.disconnect(c.id) }) { Text("断开预览") }
-     TextButton(enabled=vm.ready.value, onClick={ activity.command("START",c.id) }) { Text("录像") }
-     TextButton(onClick={ activity.command("STOP",c.id) }) { Text("停止") }
-    }
-    Row {
-     TextButton(onClick={ vm.closeRecording(); selected=c.id; activity.withNetworkPermission { vm.app.sessions.probe(c) } }) { Text("sout 实验（重连）") }
-     TextButton(onClick={ vm.remove(c); if(selected==c.id) selected=null }) { Text("删除设备") }
-    }
-   }
-   TextButton(onClick={ vm.cleanup() }) { Text("清理无法恢复的临时录像") }
-   HorizontalDivider(); Text("已发布录像")
-   recordings.forEach { r ->
-    Text(r.name)
-    Row {
-     TextButton(onClick={ vm.playRecording(r.uri) }) { Text("回放") }
-     TextButton(onClick={ if(local==r.uri) vm.closeRecording(); vm.delete(r) }) { Text("删除") }
-    }
-   }
-  }
- }
+ }, confirmButton={ TextButton(enabled=!vm.saving, onClick={ vm.save(name,url,user,password.ifEmpty { connection?.password ?: "" },tcp,dismiss) }) { Text(if(vm.saving) "保存中…" else "保存") } }, dismissButton={ TextButton(enabled=!vm.saving, onClick=dismiss) { Text("取消") } })
 }
-@Composable private fun VideoView(player: VlcPlayer, height: Int) {
- AndroidView(factory={ context -> playerView(context,player) }, modifier=Modifier.fillMaxWidth().height(height.dp), onRelease={ player.detach(it) })
+private fun connectionLabel(state: ConnectionState) = when(state) {
+ ConnectionState.DISCONNECTED -> "未连接"; ConnectionState.CONNECTING -> "连接中"; ConnectionState.CONNECTED -> "已连接"; ConnectionState.RECONNECTING -> "重连中"; ConnectionState.ERROR -> "连接失败"
 }
-private fun playerView(context: android.content.Context, player: VlcPlayer): android.view.View {
- // Keep the LibVLC view type behind the media module boundary.
- return com.rtspmonitor.media.createVideoView(context, player)
+private fun recordingLabel(state: RecordingState) = when(state) {
+ RecordingState.IDLE -> "未录像"; RecordingState.PREPARING -> "准备中"; RecordingState.RECORDING -> "正在录像"; RecordingState.FINALIZING -> "保存中"; RecordingState.INTERRUPTED -> "等待重连"; RecordingState.FAILED -> "录像失败"
 }
+private fun playerView(context: android.content.Context, player: VlcPlayer): android.view.View = com.rtspmonitor.media.createVideoView(context, player)

@@ -24,13 +24,19 @@ class CameraSessionManager(private val app: MonitorApp) {
  private val sessions = mutableMapOf<String, Session>()
  val states = MutableStateFlow<Map<String, SessionStatus>>(emptyMap())
  val message = MutableStateFlow("")
- var decodeLimit = 1
- var recordingLimit = 1
+ val decodeLimit = 1
+ val recordingLimit = 1
  private fun update(id: String, state: SessionStatus) { sessions[id]?.state?.value = state; states.value = sessions.mapValues { it.value.state.value } }
  fun session(id: String): Session = sessions.getOrPut(id) {
   Session(VlcPlayer(app)).also { session -> session.observer = scope.launch {
    session.player.status.collect { p -> update(id, session.state.value.copy(connectionState = p.state, lastError = p.error ?: session.state.value.lastError)) }
   } }
+ }
+ private fun allowedCamera(id: String): Boolean {
+  val selected = app.getSharedPreferences("monitor", android.content.Context.MODE_PRIVATE).getString("active_camera", null)
+  val otherActive = sessions.any { (key, value) -> key != id && (value.job?.isCompleted == false || value.player.status.value.state in listOf(ConnectionState.CONNECTED, ConnectionState.CONNECTING, ConnectionState.RECONNECTING)) }
+  if((selected != null && selected != id) || otherActive) { message.value = "当前仅支持同一摄像头的一路预览和录像"; return false }
+  return true
  }
  private fun canDecode(id: String): Boolean {
   val count = sessions.filterKeys { it != id }.values.count { it.player.status.value.state in listOf(ConnectionState.CONNECTED, ConnectionState.CONNECTING, ConnectionState.RECONNECTING) }
@@ -43,13 +49,13 @@ class CameraSessionManager(private val app: MonitorApp) {
   return false
  }
  fun connect(camera: Camera) {
-  if(!networkAllowed()) return
+  if(!allowedCamera(camera.id) || !networkAllowed()) return
   if(!canDecode(camera.id)) return
   runCatching { session(camera.id).player.connect(app.vault.decrypt(camera.encryptedConnection)) }.onFailure { message.value = "连接配置不可用，请重新输入凭据" }
  }
  fun disconnect(id: String) { sessions[id]?.player?.disconnect() }
  fun probe(camera: Camera) {
-  if(!networkAllowed()) return
+  if(!allowedCamera(camera.id) || !networkAllowed()) return
   if(!canDecode(camera.id)) return
   runCatching {
    val folder = File(app.noBackupFilesDir, "sout-probe").apply { mkdirs() }
@@ -58,6 +64,7 @@ class CameraSessionManager(private val app: MonitorApp) {
   }.onFailure { message.value = "sout 实验无法启动" }
  }
  suspend fun start(camera: Camera) {
+  if(!allowedCamera(camera.id)) return
   val s = session(camera.id)
   s.commands.withLock {
   if(s.removed || s.job?.isCompleted == false) return@withLock

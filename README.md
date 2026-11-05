@@ -1,29 +1,30 @@
-# RTSP Monitor 技术验证工程
+# RTSP Monitor
 
-Android 原生 Kotlin / Compose 工程，最低 Android 10，当前 compile/target 37。此版本用于技术验证，**真实摄像头与锁屏验收尚未完成**。
+Android 单路摄像头监控与后台录像工具，最低 Android 10。
 
+[下载 v0.4.0 测试版 APK](https://github.com/JinzhongYe/RTSPMonitor/releases/tag/v0.4.0)
 
-[下载 0.3-spike 测试安装包](https://github.com/JinzhongYe/RTSPMonitor/releases/tag/v0.3-spike)（私有仓库需登录 GitHub；Android Debug 签名）。
+主页面提供实时预览、连接状态、录像控制、横屏全屏及录像回放。地址与凭据在设置中修改；默认地址为 `rtsp://192.168.0.210:554/stream1`，用户名 `admin`，默认 TCP。首次使用需自行输入密码，凭据使用 Android Keystore 加密保存在本机。
 
-```bash
-# 需要 JDK 21、Android SDK 37.0、NDK 27.0.12077973、make、curl、tar
-# local.properties 中配置 sdk.dir；原生脚本通过 ANDROID_SDK_ROOT 定位 SDK
-export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
-./gradlew assembleDebug testDebugUnitTest lintDebug
-./gradlew :data:connectedDebugAndroidTest :media:connectedDebugAndroidTest
-python3 tools/test_check_media.py
+只允许同一摄像头的一路预览和一路录像。录像使用独立连接，后台前台服务运行；默认每五分钟分段保存。更新配置时先停止录像并完成收尾。旧版存在多个设备时需选择使用的一路；其他设备记录和历史录像保留。
+
+## 安装与升级
+
+v0.4.0 使用新的固定 Debug 测试签名，与 v0.3-spike 签名不同，不能直接覆盖安装。卸载旧版前先备份所需录像；卸载会清除设备配置、凭据和应用私有临时录像。新签名密钥保存在本机构建账户及 GitHub Actions Secret，后续测试版沿用。
+
+## 构建与验证
+
+Linux/macOS 下需要 JDK 21、Android SDK 37、NDK 27.0.12077973、bash、make、curl、tar。设置 `ANDROID_SDK_ROOT` 后运行：
+
+```sh
+bash gradlew assembleDebug testDebugUnitTest lintDebug :app:assembleDebugAndroidTest
+python3 -m unittest discover -s tools -p 'test_*.py'
 ```
 
-首次构建自动下载并校验 FFmpeg 源码，编译 arm64-v8a / x86_64 原生库。使用 Linux 时显式设置 ANDROID_SDK_ROOT。下载与原生编译需要网络和数分钟，后续由 Gradle 增量检查。APK 位于 `app/build/outputs/apk/debug/app-debug.apk`。没有打包 32 位 ABI。
+首次构建会下载并校验 FFmpeg，编译 arm64-v8a / x86_64。GitHub Actions 自动执行构建、检查、配置回归测试和启动截图，使用 Secret `DEBUG_KEYSTORE` 中的 Base64 编码固定测试密钥。
 
-页面中输入设备名称、RTSP URL 和独立凭据，选择 TCP/UDP 后保存。连接用于预览；录像按钮启动独立连接的前台服务；停止按钮完成收尾。通知可停止全部录像。发布成功的录像出现在页面下方，可回放和删除。首次启动会尝试恢复遗留录像；失败片段保留，可手动清理。默认同时允许一路预览、一路录像，测试配额可逐次增加。
+真实摄像头、锁屏长时录像及 API 37 实机权限验收需要对应设备与局域网，不能由构建通过代替。既有验证记录针对 v0.3-spike，不代表 v0.4.0 已实测。
 
-sout 按钮是显式实验：重建播放会话，同时尝试显示与写 MP4；断开预览后收尾。它不等于已实现“保持原会话动态开始/停止录像”。实验文件保存在应用私有 `no_backup/sout-probe/`，不会自动发布。
-
-- [完成报告与验收边界](docs/COMPLETION_REPORT.md)
 - [架构](docs/ARCHITECTURE.md)
-- [技术验证结果与问题](docs/TECHNICAL_SPIKE.md)
-- [测试矩阵与复现](docs/TEST_MATRIX.md)
-- [依赖、许可证与分发前检查](docs/DEPENDENCIES.md)
-
-当前 0.3-spike 已完成本地 TCP/UDP 出帧、AAC、默认五分钟双路录像、MediaStore 回放、模拟器后台与进程恢复验证。最新结果见[完成报告](docs/COMPLETION_REPORT.md)，前一轮证据与复现脚本见 [第2～6步记录](docs/STEPS_2_6_VALIDATION.md)；旧阶段失败与取舍保留在历史报告。
+- [既有技术验证报告](docs/COMPLETION_REPORT.md)
+- [依赖与分发材料](docs/DEPENDENCIES.md)
