@@ -1,0 +1,53 @@
+name: Publish v0.8.0
+on: workflow_dispatch
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: JinzhongYe/RTSPMonitor
+      DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify and publish fixed-signature build
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/$GH_REPO/actions/runs/42156396083 --jq .conclusion)" = success
+          test "$(gh api repos/$GH_REPO/actions/runs/42156396083 --jq .head_sha)" = adf0e86329e579118117f078c3552dedda8ff4f7
+          git diff --exit-code adf0e86329e579118117f078c3552dedda8ff4f7 HEAD -- app core data media tools gradle build.gradle.kts settings.gradle.kts gradle.properties gradlew gradlew.bat
+          gh run download 42156396083 --name RTSPMonitor-0.8.0 --dir dist
+          (cd dist && sha256sum --check SHA256SUMS.txt)
+          sha256sum dist/RTSPMonitor-0.8.0-debug.apk | cut -d ' ' -f 1 > "$RUNNER_TEMP/rtsp-input-sha256"
+          test -n "$DEBUG_KEYSTORE"
+          printf '%s' "$DEBUG_KEYSTORE" | base64 --decode > "$RUNNER_TEMP/rtsp-debug.keystore"
+          rtsp_signer=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n 1)
+          "$rtsp_signer" sign --ks "$RUNNER_TEMP/rtsp-debug.keystore" --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --v4-signing-enabled false dist/RTSPMonitor-0.8.0-debug.apk
+          rm -f "$RUNNER_TEMP/rtsp-debug.keystore"
+          "$rtsp_signer" verify --print-certs dist/RTSPMonitor-0.8.0-debug.apk > dist/apk-signature.txt
+          grep -qi ff51a90e4557e7cf86f3e19b771a4c432d7e5969317cedf7e3d001ae7f9597d3 dist/apk-signature.txt
+          cp docs/SETTINGS_0.8.0.md dist/
+          cp docs/evidence/settings-0.8.0/*.png dist/
+          gh api repos/$GH_REPO/actions/runs/42156396083 --jq '{buildRun:.html_url,sourceCommit:.head_sha,conclusion}' > dist/build-provenance.json
+          python3 -c 'import json,os,pathlib; p=pathlib.Path("dist/build-provenance.json"); v=json.loads(p.read_text()); v["inputArtifactApkSha256"]=pathlib.Path(os.environ["RUNNER_TEMP"],"rtsp-input-sha256").read_text().strip(); v["resignedWithExistingTestKey"]=True; p.write_text(json.dumps(v,indent=2)+"\n")'
+          (cd dist && sha256sum RTSPMonitor-0.8.0-debug.apk apk-signature.txt SETTINGS_0.8.0.md build-provenance.json settings.png large-font.png > SHA256SUMS.txt)
+          gh release create v0.8.0 dist/* --target adf0e86329e579118117f078c3552dedda8ff4f7 --title 'v0.8.0 - 可调检测阈值与手动分段' --draft --prerelease --notes-file docs/RELEASE_NOTES_0.8.0.md
+          gh api repos/$GH_REPO/releases > "$RUNNER_TEMP/rtsp-releases.json"
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,subprocess
+          release=next(r for r in json.load(open(os.environ['RUNNER_TEMP']+'/rtsp-releases.json')) if r['tag_name']=='v0.8.0')
+          expected={p.name:p for p in pathlib.Path('dist').iterdir() if p.is_file()}
+          assets={a['name']:a for a in release['assets']}
+          assert assets.keys()==expected.keys()
+          for name,p in expected.items():
+              assert assets[name]['state']=='uploaded'
+              assert assets[name]['size']==p.stat().st_size
+              assert assets[name]['digest']=='sha256:'+hashlib.sha256(p.read_bytes()).hexdigest()
+          subprocess.run(['gh','api','--method','PATCH',f"repos/{os.environ['GH_REPO']}/releases/{release['id']}",'-F','draft=false','-F','prerelease=true'],check=True,stdout=subprocess.DEVNULL)
+          print('Published v0.8.0; all asset digests verified.')
+          PY
