@@ -52,9 +52,11 @@ class PlaybackLayoutTest {
     capture("portrait")
     scenario.onActivity { vm.player.speedPlayback(0.5f) }
     click("全屏")
-    withTimeout(10000) { while(app.resources.configuration.orientation!=android.content.res.Configuration.ORIENTATION_LANDSCAPE)delay(100) }
+    try { withTimeout(10000) { while(app.resources.configuration.orientation!=android.content.res.Configuration.ORIENTATION_LANDSCAPE)delay(100) } }
+    catch(e:TimeoutCancellationException) { fail("Fullscreen orientation did not change: ${app.resources.configuration.orientation}") }
     scenario.onActivity { assertSame(vm,androidx.lifecycle.ViewModelProvider(it)[PlaybackViewModel::class.java]) }
-    withTimeout(10000) { while(!vm.player.playback.value.playing)delay(100) }
+    try { withTimeout(10000) { while(!vm.player.playback.value.playing)delay(100) } }
+    catch(e:TimeoutCancellationException) { capture("failure");fail("Playback stopped after rotation: ${vm.player.playback.value}; ${vm.player.status.value}") }
     delay(3800);assertNull("Playing fullscreen controls auto-hide: ${vm.player.playback.value}",panel());capture("fullscreen-hidden")
     assertTrue(checkNotNull(video()).performAction(AccessibilityNodeInfo.ACTION_CLICK))
     withTimeout(3000) { while(panel()==null)delay(100) }

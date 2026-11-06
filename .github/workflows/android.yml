@@ -83,3 +83,9 @@ jobs:
             **/build/reports/
             **/build/test-results/
             app/build/outputs/apk/androidTest/debug/*.apk
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playback-debug
+          path: app/build/outputs/apk/
