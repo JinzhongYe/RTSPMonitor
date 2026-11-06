@@ -1,0 +1,25 @@
+{
+  "version": "0.7.0",
+  "versionCode": 7,
+  "apkSha256": "4c66705eabc47377309cad4a20be539989c31d2e6ee4df1d23eb985711681815",
+  "runtime": "Android 15 API35 arm64 emulator",
+  "unitTests": {
+    "passed": 24,
+    "failed": 0
+  },
+  "layoutChecks": {
+    "normal393dp": "PASS",
+    "narrow320dp": "PASS",
+    "fontScale1_4": "PASS",
+    "fullscreenManualClick": "PASS"
+  },
+  "recordingIsolationWithExportAndDelete": {
+    "passed": 1,
+    "skippedActivityNativeTest": 1
+  },
+  "playbackRecreationPixelCopy": {
+    "passed": 1
+  },
+  "physicalCameraTested": false,
+  "githubReleasePublishedAtValidation": false
+}

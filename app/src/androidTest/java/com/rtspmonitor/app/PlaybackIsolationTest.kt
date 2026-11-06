@@ -78,6 +78,15 @@ class PlaybackIsolationTest {
      }
      playback.recreate()
      playback.onActivity { assertSame(vm,androidx.lifecycle.ViewModelProvider(it)[PlaybackViewModel::class.java]) }
+     lateinit var operation:Job
+     playback.onActivity { operation=vm.export(item) };operation.join()
+     assertSame(job,app.sessions.session(id).job);assertTrue(job!!.isActive)
+     val exported=app.database.dao().recordings().first().single { it.uri==item.uri }.exportedUri
+     assertNotNull(exported)
+     playback.onActivity { operation=vm.delete(item) };operation.join()
+     assertNull(vm.uri)
+     assertSame(job,app.sessions.session(id).job);assertTrue(job.isActive)
+     exported?.let { app.contentResolver.delete(android.net.Uri.parse(it),null,null) }
     }
     assertTrue(job!!.isActive)
     withContext(Dispatchers.Main) { app.sessions.stop(id) }

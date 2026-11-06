@@ -1,0 +1,8 @@
+
+com.rtspmonitor.app.PlaybackViewModelTest:.
+
+Time: 3.274
+
+OK (1 test)
+
+

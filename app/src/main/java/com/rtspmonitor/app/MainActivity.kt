@@ -76,18 +76,8 @@ class MonitorViewModel(application: android.app.Application): AndroidViewModel(a
    app.sessions.message.value = "保存失败，请检查地址、独立凭据或 Keystore"
   } finally { saving = false }
  }
- var exporting by mutableStateOf<String?>(null)
-  private set
- fun export(recording:Recording)=viewModelScope.launch {
-  if(exporting!=null)return@launch
-  exporting=recording.uri
-  try { app.store.export(recording);app.sessions.message.value="已保存到系统相册" }
-  catch(e:Exception) { if(e is kotlinx.coroutines.CancellationException)throw e;app.sessions.message.value="导出失败，原录像已保留" }
-  finally { exporting=null }
- }
  fun cleanup() = viewModelScope.launch { app.sessions.cleanupDamaged() }
  fun remove(c: Camera) = viewModelScope.launch { app.sessions.remove(c) }
- fun delete(r: Recording) = viewModelScope.launch { runCatching { app.store.delete(r) }.onFailure { app.sessions.message.value = "删除录像失败" } }
 }
 class MainActivity: ComponentActivity() {
  var resumeCount by mutableIntStateOf(0)
@@ -137,8 +127,6 @@ class MainActivity: ComponentActivity() {
  LaunchedEffect(camera?.id) { if(camera != null && vm.activeId != camera.id) vm.selectCamera(camera) }
  var settings by rememberSaveable { mutableStateOf(false) }
  var full by rememberSaveable { mutableStateOf(false) }
- var filter by rememberSaveable { mutableIntStateOf(0) }
- var deleting by remember { mutableStateOf<Recording?>(null) }
  val player = camera?.let { vm.app.sessions.session(it.id).player }
  val state = camera?.let { states[it.id] } ?: SessionStatus()
  val busy = state.recordingState in listOf(RecordingState.PREPARING, RecordingState.RECORDING, RecordingState.FINALIZING, RecordingState.INTERRUPTED)
@@ -198,26 +186,15 @@ class MainActivity: ComponentActivity() {
     }
    }
    if(message.isNotEmpty()) item { Text(message, style=MaterialTheme.typography.bodyMedium) }
-   item { Text("录像 (${recordings.size})", style=MaterialTheme.typography.titleLarge) }
-   if(recordings.isEmpty()) item { Text("暂无录像，开始录像后会自动分段保存。") }
-   item { Row { listOf(0 to "全部",1 to "手动",2 to "活动").forEach { (mask,label) -> TextButton(onClick={filter=mask}) { Text(if(filter==mask) "✓ $label" else label) } } } }
-   items(recordings.filter { filter==0 || it.sourceMask and filter !=0 }, key={ it.uri }) { r ->
-    OutlinedCard(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
-     Text(if(r.sourceMask==3) "手动＋活动" else recordingSourceLabel(r.sourceMask), style=MaterialTheme.typography.labelLarge)
-     Text(r.name, style=MaterialTheme.typography.titleSmall)
-     Text(if(r.startedAt!=null && r.endedAt!=null && r.offsetMinutes!=null) recordingRangeName(SegmentMetadata(r.startedAt!!,r.endedAt!!,r.offsetMinutes!!,r.sourceMask)).substringBeforeLast('_') else "录制时间未知（历史录像）", style=MaterialTheme.typography.bodySmall)
-     Row {
-      TextButton(onClick={ activity.startActivity(Intent(activity,PlaybackActivity::class.java).putExtra("uri",r.uri)) }) { Text("回放") }
-      TextButton(enabled=vm.exporting==null,onClick={ vm.export(r) }) { Text(if(vm.exporting==r.uri) "保存中…" else if(r.exportedUri!=null || android.net.Uri.parse(r.uri).scheme!="file") "已保存到相册" else "保存到相册") }
-      TextButton(enabled=vm.exporting!=r.uri,onClick={ deleting=r }) { Text("删除") }
-     }
-    } }
-   }
+   item { OutlinedCard(Modifier.fillMaxWidth()) { Row(Modifier.fillMaxWidth().padding(16.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween) {
+    Column { Text("本地录像",style=MaterialTheme.typography.titleMedium);Text("${recordings.size} 个已完成片段",style=MaterialTheme.typography.bodySmall) }
+    TextButton(onClick={activity.startActivity(Intent(activity,PlaybackActivity::class.java))}) { Text("查看录像 ›") }
+   } } }
    item { TextButton(enabled=!busy, onClick={ vm.cleanup() }) { Text("清理损坏的临时录像") } }
   }
  }
  if(settings) CameraSettings(vm, camera) { settings=false }
- deleting?.let { r -> AlertDialog(onDismissRequest={ deleting=null }, title={ Text("删除录像？") }, text={ Text("删除应用内录像后无法恢复，已经导出的相册副本不受影响；旧版相册录像会删除原文件。") }, confirmButton={ TextButton(onClick={ vm.delete(r); deleting=null }) { Text("删除") } }, dismissButton={ TextButton(onClick={ deleting=null }) { Text("取消") } }) }
+
 }
 @Composable private fun CameraSettings(vm: MonitorViewModel, camera: Camera?, dismiss: () -> Unit) {
  val connection = remember(camera) { camera?.let { vm.connection(it) } }
