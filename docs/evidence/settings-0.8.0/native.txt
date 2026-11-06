@@ -1,0 +1,142 @@
+[=========                              ] 25%                                   > Task :core:preBuild UP-TO-DATE
+> Task :core:preDebugBuild UP-TO-DATE
+> Task :core:generateDebugResources UP-TO-DATE
+> Task :core:packageDebugResources UP-TO-DATE
+> Task :core:processDebugNavigationResources UP-TO-DATE
+> Task :core:parseDebugLocalResources UP-TO-DATE
+> Task :core:generateDebugRFile UP-TO-DATE
+> Task :core:compileDebugKotlin UP-TO-DATE
+> Task :core:javaPreCompileDebug UP-TO-DATE
+> Task :core:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :data:preBuild UP-TO-DATE
+> Task :data:preDebugBuild UP-TO-DATE
+> Task :data:generateDebugResources UP-TO-DATE
+> Task :data:packageDebugResources UP-TO-DATE
+> Task :data:processDebugNavigationResources UP-TO-DATE
+> Task :data:parseDebugLocalResources UP-TO-DATE
+> Task :data:generateDebugRFile UP-TO-DATE
+> Task :data:kaptGenerateStubsDebugKotlin UP-TO-DATE
+> Task :data:kaptDebugKotlin UP-TO-DATE
+> Task :data:compileDebugKotlin UP-TO-DATE
+> Task :data:javaPreCompileDebug UP-TO-DATE
+> Task :data:compileDebugJavaWithJavac UP-TO-DATE
+> Task :data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :media:buildNative UP-TO-DATE
+> Task :media:preBuild UP-TO-DATE
+> Task :media:preDebugBuild UP-TO-DATE
+> Task :media:generateDebugResources UP-TO-DATE
+> Task :media:packageDebugResources UP-TO-DATE
+> Task :media:processDebugNavigationResources UP-TO-DATE
+> Task :media:parseDebugLocalResources UP-TO-DATE
+> Task :media:generateDebugRFile UP-TO-DATE
+> Task :media:compileDebugKotlin UP-TO-DATE
+> Task :media:javaPreCompileDebug UP-TO-DATE
+> Task :media:compileDebugJavaWithJavac NO-SOURCE
+> Task :media:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :media:preDebugAndroidTestBuild UP-TO-DATE
+> Task :media:generateDebugAndroidTestResources UP-TO-DATE
+> Task :media:packageDebugAndroidTestResources UP-TO-DATE
+> Task :media:processDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :media:parseDebugAndroidTestLocalResources UP-TO-DATE
+> Task :media:generateDebugAndroidTestRFile UP-TO-DATE
+> Task :media:javaPreCompileDebugAndroidTest UP-TO-DATE
+> Task :core:generateDebugAssets UP-TO-DATE
+> Task :core:mergeDebugAssets UP-TO-DATE
+> Task :data:generateDebugAssets UP-TO-DATE
+> Task :data:mergeDebugAssets UP-TO-DATE
+> Task :media:generateDebugAndroidTestAssets UP-TO-DATE
+> Task :media:generateDebugAssets UP-TO-DATE
+> Task :media:mergeDebugAssets UP-TO-DATE
+> Task :media:mergeDebugAndroidTestAssets UP-TO-DATE
+> Task :media:compressDebugAndroidTestAssets UP-TO-DATE
+> Task :media:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :data:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :media:desugarDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :core:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:compileDebugLibraryResources UP-TO-DATE
+> Task :data:mapDebugSourceSetPaths UP-TO-DATE
+> Task :data:compileDebugLibraryResources UP-TO-DATE
+> Task :core:writeDebugAarMetadata UP-TO-DATE
+> Task :data:writeDebugAarMetadata UP-TO-DATE
+> Task :media:writeDebugAarMetadata UP-TO-DATE
+> Task :media:checkDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :media:mapDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :media:compileDebugAndroidTestNavigationResources UP-TO-DATE
+> Task :media:mapDebugSourceSetPaths UP-TO-DATE
+> Task :media:compileDebugLibraryResources UP-TO-DATE
+> Task :media:mergeDebugAndroidTestResources UP-TO-DATE
+> Task :core:extractDeepLinksDebug UP-TO-DATE
+> Task :core:processDebugManifest UP-TO-DATE
+> Task :data:extractDeepLinksDebug UP-TO-DATE
+> Task :data:processDebugManifest UP-TO-DATE
+> Task :media:extractDeepLinksDebug UP-TO-DATE
+> Task :media:processDebugManifest UP-TO-DATE
+> Task :media:processDebugAndroidTestManifest UP-TO-DATE
+> Task :media:processDebugAndroidTestResources UP-TO-DATE
+> Task :core:processDebugJavaRes UP-TO-DATE
+> Task :data:processDebugJavaRes UP-TO-DATE
+> Task :media:processDebugJavaRes UP-TO-DATE
+> Task :media:checkDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :media:mergeExtDexDebugAndroidTest UP-TO-DATE
+> Task :media:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :data:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :core:mergeDebugJniLibFolders UP-TO-DATE
+> Task :core:mergeDebugNativeLibs NO-SOURCE
+> Task :core:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :data:mergeDebugJniLibFolders UP-TO-DATE
+> Task :data:mergeDebugNativeLibs NO-SOURCE
+> Task :data:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :media:mergeDebugJniLibFolders UP-TO-DATE
+> Task :media:mergeDebugNativeLibs UP-TO-DATE
+> Task :media:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :media:mergeDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :media:mergeLibDexDebugAndroidTest
+> Task :media:validateSigningDebugAndroidTest UP-TO-DATE
+> Task :media:writeDebugAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :media:compileDebugAndroidTestKotlin
+> Task :media:compileDebugAndroidTestJavaWithJavac NO-SOURCE
+> Task :media:dexBuilderDebugAndroidTest
+> Task :media:processDebugAndroidTestJavaRes UP-TO-DATE
+> Task :media:mergeDebugAndroidTestJavaResource UP-TO-DATE
+> Task :media:mergeDebugAndroidTestGlobalSynthetics
+> Task :media:mergeProjectDexDebugAndroidTest
+> Task :media:mergeDebugAndroidTestNativeLibs
+> Task :media:stripDebugAndroidTestDebugSymbols
+> Task :media:packageDebugAndroidTest
+> Task :media:createDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :media:assembleDebugAndroidTest
+
+BUILD SUCCESSFUL in 4s
+93 actionable tasks: 8 executed, 85 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.1/userguide/configuration_cache_enabling.html
+Performing Streamed Install
+Success
+
+com.rtspmonitor.media.FixtureTest:..
+
+Time: 0.606
+
+OK (2 tests)
+
+
+/sdcard/Android/data/com.rtspmonitor.media.test/files/fixtures/./: 3 files pulled, 0 skipped. 24.7 MB/s (127819 bytes in 0.005s)
+
+com.rtspmonitor.media.MediaStoreVideoTest:...
+
+Time: 0.297
+
+OK (3 tests)
+
+
+
+com.rtspmonitor.media.RtspRecordingTest:.....
+
+Time: 30.702
+
+OK (5 tests)
+
+
+Artifacts: /Users/yejinzhong/Documents/RTSP/tools/vendor/spike-20261106-111948

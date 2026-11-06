@@ -22,6 +22,7 @@ interface RtspPlayerEngine {
     fun release()
 }
 interface RecordingEngine {
+    fun setSegmentSeconds(seconds:Int)
     suspend fun record(connection: Connection, directory: File, segmentSeconds: Int = 300, onEvent: (String, String) -> Unit): Int
     fun stop()
 }

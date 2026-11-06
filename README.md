@@ -2,7 +2,7 @@
 
 Android 单路摄像头监控、活动检测与后台录像，最低 Android 10。
 
-[下载 v0.7.0 测试版](https://github.com/JinzhongYe/RTSPMonitor/releases/tag/v0.7.0)
+[下载 v0.8.0 测试版](https://github.com/JinzhongYe/RTSPMonitor/releases/tag/v0.8.0)
 
 ## 使用
 
@@ -43,3 +43,5 @@ python3 -m unittest discover -s tools -p 'test_*.py'
 最新本地开发版本 0.6.0：独立回放、来源分类、时间范围文件名及活动通知隔离，详见[本轮实现与测试记录](docs/PLAYBACK_RECORDING_UPDATE.md)。[下载 0.6.0 预发布安装包](https://github.com/JinzhongYe/RTSPMonitor/releases/tag/v0.6.0)（调试签名；活动通知真机验收仍待完成）。
 
 本地开发版本 0.7.0 按参考照片优化了回放和录像浏览布局，见[布局与截图记录](docs/UI_0.7.0.md)。[下载 0.7.0 预发布安装包](https://github.com/JinzhongYe/RTSPMonitor/releases/tag/v0.7.0)。
+
+0.8.0 新增独立的“检测与录像设置”：可调整人形置信分、变化面积、亮度差和手动分段时长；设置持久化且运行中生效，活动录像保持5分钟，重叠时手动优先。详见[设置验证报告](docs/SETTINGS_0.8.0.md)。

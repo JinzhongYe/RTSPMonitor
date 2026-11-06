@@ -8,7 +8,7 @@
 #include <libavutil/log.h>
 #include <libavutil/mathematics.h>
 
-typedef struct { atomic_int stop; int64_t deadline; } Control;
+typedef struct { atomic_int stop; atomic_int segment_seconds; int64_t deadline; } Control;
 static int interrupt(void *p) { Control *c=p; return atomic_load(&c->stop) || av_gettime_relative() > c->deadline; }
 static void event(JNIEnv *env, jobject cb, const char *kind, const char *value) {
  jclass cls=(*env)->GetObjectClass(env,cb);
@@ -18,6 +18,7 @@ static void event(JNIEnv *env, jobject cb, const char *kind, const char *value) 
  (*env)->DeleteLocalRef(env,k); (*env)->DeleteLocalRef(env,v); (*env)->DeleteLocalRef(env,cls);
 }
 JNIEXPORT jlong JNICALL Java_com_rtspmonitor_media_AvRecorder_create(JNIEnv *e,jobject o) { return (jlong)calloc(1,sizeof(Control)); }
+JNIEXPORT void JNICALL Java_com_rtspmonitor_media_AvRecorder_configure(JNIEnv *e,jobject o,jlong h,jint seconds) { if(h && seconds>0) atomic_store(&((Control*)h)->segment_seconds,seconds); }
 JNIEXPORT void JNICALL Java_com_rtspmonitor_media_AvRecorder_cancel(JNIEnv *e,jobject o,jlong h) { if(h) atomic_store(&((Control*)h)->stop,1); }
 JNIEXPORT void JNICALL Java_com_rtspmonitor_media_AvRecorder_destroy(JNIEnv *e,jobject o,jlong h) { free((void*)h); }
 static int finish(AVFormatContext **out) {
@@ -27,6 +28,7 @@ static int finish(AVFormatContext **out) {
 }
 JNIEXPORT jint JNICALL Java_com_rtspmonitor_media_AvRecorder_run(JNIEnv *env,jobject self,jlong handle,jstring jurl,jboolean tcp,jstring jdir,jint seconds,jobject cb) {
  Control *ctl=(Control*)handle;
+ int initial=0; atomic_compare_exchange_strong(&ctl->segment_seconds,&initial,seconds);
  const char *url=(*env)->GetStringUTFChars(env,jurl,NULL), *dir=(*env)->GetStringUTFChars(env,jdir,NULL);
  AVFormatContext *in=avformat_alloc_context(), *out=NULL;
  AVPacket *pkt=av_packet_alloc(); AVDictionary *opts=NULL;
@@ -62,7 +64,7 @@ JNIEXPORT jint JNICALL Java_com_rtspmonitor_media_AvRecorder_run(JNIEnv *env,job
   if(index<0 || pkt->dts==AV_NOPTS_VALUE || pkt->pts==AV_NOPTS_VALUE) { av_packet_unref(pkt); continue; }
   int64_t dts=av_rescale_q(pkt->dts,in->streams[pkt->stream_index]->time_base,AV_TIME_BASE_Q);
   int key=index==0 && (pkt->flags & AV_PKT_FLAG_KEY);
-  if(out && key && dts-start >= (int64_t)seconds*AV_TIME_BASE) {
+  if(out && key && dts-start >= (int64_t)atomic_load(&ctl->segment_seconds)*AV_TIME_BASE) {
    result=finish(&out); if(result<0) break;
    if(rename(path,final)!=0) { result=AVERROR(EIO); break; }
    event(env,cb,"segment",final);

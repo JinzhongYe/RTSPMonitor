@@ -7,6 +7,7 @@ class ActivityPolicy {
  private var consecutive = 0
  private var lastActivity = 0L
  private var lastFrame: Long? = null
+ fun resetEvidence() { consecutive=0 }
  fun reset() { active = false; consecutive = 0; lastFrame = null }
  fun sample(person: Boolean, changed: Boolean, now: Long): Boolean {
   val previous = lastFrame

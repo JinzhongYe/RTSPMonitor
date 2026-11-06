@@ -38,6 +38,30 @@ class RtspRecordingTest {
             checkVideo(file,"video/avc")
         } finally { engine.stop();withContext(NonCancellable) { job.join() };engine.close() }
     }
+    @Test fun segmentLimitCanShrinkAndGrowWithoutRestart()=runBlocking {
+        val base=InstrumentationRegistry.getArguments().getString("rtspBase");assumeTrue(base!=null)
+        val context=InstrumentationRegistry.getInstrumentation().targetContext
+        val folder=File(context.getExternalFilesDir("spike-results"),"limits-${System.currentTimeMillis()}").apply { mkdirs() }
+        val engine=AvRecorder()
+        val segments=CopyOnWriteArrayList<File>();var opened=0
+        val job=async(Dispatchers.IO) { engine.record(Connection("$base/h264","","",Transport.TCP),folder,8) { kind,value ->
+            if(kind=="recording") { opened++;engine.setSegmentSeconds(if(opened==1)2 else 4) }
+            if(kind=="segment")segments.add(File(value))
+        } }
+        try {
+            withTimeout(30000) { while(segments.size<2)delay(100) }
+            assertTrue(job.isActive);engine.stop();assertEquals(0,job.await())
+            segments.take(2).forEachIndexed { index,file ->
+                val extractor=MediaExtractor()
+                try {
+                    extractor.setDataSource(file.path);extractor.selectTrack(0)
+                    var last=0L;while(extractor.sampleTime>=0) { last=maxOf(last,extractor.sampleTime);if(!extractor.advance())break }
+                    assertTrue("Unexpected segment duration $last",if(index==0)last in 1800000..2500000 else last in 3800000..4500000)
+                } finally { extractor.release() }
+                checkVideo(file,"video/avc");decodeTrack(file,"video/avc")
+            }
+        } finally { engine.stop();withContext(NonCancellable) { job.join() };engine.close() }
+    }
     @Test fun h264Tcp() = record("h264", Transport.TCP, "video/avc")
     @Test fun h264Udp() = record("h264", Transport.UDP, "video/avc")
     @Test fun h265Tcp() = record("h265", Transport.TCP, "video/hevc")

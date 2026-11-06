@@ -62,11 +62,17 @@ class PlaybackIsolationTest {
   instrumentation.context.assets.open("h264.mp4").use { input -> fixture.outputStream().use { input.copyTo(it) } }
   app.store.publish(fixture,camera)
   val item=app.database.dao().recordings().first().single { it.cameraId==id }
+  val settingsBefore=app.monitorSettings.state.value
   try {
    ActivityScenario.launch(MainActivity::class.java).use { main ->
     main.onActivity { it.command("START",id) }
     withTimeout(30000) { while(app.sessions.states.value[id]?.recordingState!=RecordingState.RECORDING)delay(100) }
     val job=app.sessions.session(id).job
+    withContext(Dispatchers.IO) { app.monitorSettings.save(settingsBefore.copy(manualSegmentMinutes=1)) }
+    withTimeout(5000) { while(app.sessions.session(id).segmentSeconds!=60)delay(100) }
+    assertSame(job,app.sessions.session(id).job)
+    withContext(Dispatchers.IO) { app.monitorSettings.save(settingsBefore) }
+    withTimeout(5000) { while(app.sessions.session(id).segmentSeconds!=settingsBefore.manualSegmentMinutes*60)delay(100) }
     ActivityScenario.launch<PlaybackActivity>(Intent(app,PlaybackActivity::class.java).putExtra("uri",item.uri)).use { playback ->
      lateinit var vm:PlaybackViewModel
      playback.onActivity { vm=androidx.lifecycle.ViewModelProvider(it)[PlaybackViewModel::class.java] }
@@ -96,6 +102,7 @@ class PlaybackIsolationTest {
     assertTrue(recorded.name.endsWith("_手动.mp4"))
    }
   } finally {
+   withContext(Dispatchers.IO) { app.monitorSettings.save(settingsBefore) }
    app.startService(Intent(app,RecordingForegroundService::class.java).setAction("STOP_ALL"))
    delay(1500)
    withContext(Dispatchers.Main) { app.sessions.remove(camera) }

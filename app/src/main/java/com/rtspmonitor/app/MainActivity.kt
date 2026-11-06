@@ -125,6 +125,7 @@ class MainActivity: ComponentActivity() {
  val automatic by vm.app.sessions.automaticRecording.collectAsState()
  val camera = cameras.firstOrNull { it.id == vm.activeId } ?: cameras.singleOrNull()
  LaunchedEffect(camera?.id) { if(camera != null && vm.activeId != camera.id) vm.selectCamera(camera) }
+ var detectionSettings by rememberSaveable { mutableStateOf(false) }
  var settings by rememberSaveable { mutableStateOf(false) }
  var full by rememberSaveable { mutableStateOf(false) }
  val player = camera?.let { vm.app.sessions.session(it.id).player }
@@ -146,6 +147,7 @@ class MainActivity: ComponentActivity() {
      TextButton(enabled=vm.ready.value && !vm.saving && !monitoring && !manual && (camera != null || cameras.isEmpty()), onClick={ settings=true }) { Text("设置") }
     }
    }
+   item { TextButton(onClick={detectionSettings=true}) { Text("检测与录像设置") } }
    if(camera == null && cameras.size > 1) item {
     Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
      Text("选择本机使用的摄像头", style=MaterialTheme.typography.titleMedium)
@@ -193,6 +195,7 @@ class MainActivity: ComponentActivity() {
    item { TextButton(enabled=!busy, onClick={ vm.cleanup() }) { Text("清理损坏的临时录像") } }
   }
  }
+ if(detectionSettings) MonitorSettingsDialog(vm.app.monitorSettings) { detectionSettings=false }
  if(settings) CameraSettings(vm, camera) { settings=false }
 
 }

@@ -1,6 +1,7 @@
 package com.rtspmonitor.media
 
 import android.content.Context
+import com.rtspmonitor.core.MonitorSettings
 import android.graphics.Bitmap
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.tasks.core.BaseOptions
@@ -15,19 +16,19 @@ class ActivityDetector(context: Context): AutoCloseable {
  }
  private val detector=ObjectDetector.createFromOptions(context,ObjectDetector.ObjectDetectorOptions.builder()
   .setBaseOptions(BaseOptions.builder().setModelAssetPath("efficientdet_lite0.tflite").build())
-  .setRunningMode(RunningMode.VIDEO).setScoreThreshold(0.6f).setCategoryAllowlist(listOf("person")).build())
+  .setRunningMode(RunningMode.VIDEO).setScoreThreshold(0.1f).setCategoryAllowlist(listOf("person")).build())
  private var previous:IntArray?=null
  private var lastFrame=0L
- @Synchronized fun detect(bitmap:Bitmap,now:Long):Pair<Boolean,Boolean> {
+ @Synchronized fun detect(bitmap:Bitmap,now:Long,settings:MonitorSettings=MonitorSettings()):Pair<Boolean,Boolean> {
   // MPImage.close recycles its Bitmap; the caller still needs the original for motion comparison.
   val image=BitmapImageBuilder(checkNotNull(bitmap.copy(Bitmap.Config.ARGB_8888,false))).build()
-  val person=try { detector.detectForVideo(image,now).detections().isNotEmpty() } finally { image.close() }
+  val person=try { detector.detectForVideo(image,now).detections().any { detection -> detection.categories().any { settings.acceptsPerson(it.score()) } } } finally { image.close() }
   val gray=IntArray(64*36) { i ->
    val color=bitmap.getPixel((i%64)*bitmap.width/64,(i/64)*bitmap.height/36)
    (android.graphics.Color.red(color)*77+android.graphics.Color.green(color)*150+android.graphics.Color.blue(color)*29)/256
   }
   val prior=previous.takeIf { now-lastFrame<=3000 }
-  val motion=prior!=null && gray.indices.count { kotlin.math.abs(gray[it]-prior[it])>25 }>=gray.size*0.03
+  val motion=prior!=null && settings.changed(prior,gray)
   previous=gray;lastFrame=now
   return person to motion
  }

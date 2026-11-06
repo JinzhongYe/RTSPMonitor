@@ -29,6 +29,20 @@ class DetectionTest {
    } finally { bitmap.recycle() }
   }
  }
+ @Test fun usesConfiguredBrightnessAndAreaThresholds() {
+  val context=InstrumentationRegistry.getInstrumentation().targetContext
+  ActivityDetector(context).use { detector ->
+   val bitmap=Bitmap.createBitmap(320,320,Bitmap.Config.ARGB_8888)
+   try {
+    bitmap.eraseColor(Color.BLACK);detector.detect(bitmap,1000)
+    repeat(30) { i -> bitmap.setPixel((i%64)*320/64,(i/64)*320/36,Color.rgb(20,20,20)) }
+    assertFalse(detector.detect(bitmap,1500).second)
+    bitmap.eraseColor(Color.BLACK);detector.detect(bitmap,2000)
+    repeat(30) { i -> bitmap.setPixel((i%64)*320/64,(i/64)*320/36,Color.rgb(20,20,20)) }
+    assertTrue(detector.detect(bitmap,2500,com.rtspmonitor.core.MonitorSettings(motionAreaPercent=1,brightnessDifference=10)).second)
+   } finally { bitmap.recycle() }
+  }
+ }
  @Test fun recognizesPersonFixture() {
   assumeTrue(InstrumentationRegistry.getArguments().getString("validatePerson")=="true")
   val context=InstrumentationRegistry.getInstrumentation().targetContext

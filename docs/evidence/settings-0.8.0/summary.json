@@ -1,0 +1,12 @@
+{
+  "version": "0.8.0",
+  "versionCode": 8,
+  "localApkSha256": "d67ed37b28a47f797e7ee0d8c72600c8f927bb842bf6d3b50477d9c7680bc030",
+  "runtime": "Android15 API35 arm64 emulator",
+  "unitTestsPassed": 28,
+  "settingsPersistencePassed": 1,
+  "nativeRecordingPassed": 5,
+  "recordingIsolationWithLiveSettingsPassed": 1,
+  "activityNativeTestSkipped": 1,
+  "realCameraCalibrated": false
+}

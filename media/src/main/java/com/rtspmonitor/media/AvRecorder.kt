@@ -11,6 +11,8 @@ class AvRecorder: RecordingEngine {
  private var handle = create().also { check(it != 0L) }
  private external fun create(): Long
  private external fun run(handle: Long, url: String, tcp: Boolean, directory: String, seconds: Int, callback: Callback): Int
+ private external fun configure(handle:Long,seconds:Int)
+ override fun setSegmentSeconds(seconds:Int) { require(seconds in 1..3600);synchronized(this) { if(handle!=0L) configure(handle,seconds) } }
  private external fun cancel(handle: Long)
  private external fun destroy(handle: Long)
  interface Callback { fun event(kind: String, value: String) }

@@ -71,7 +71,7 @@ done
 sleep 1
 case "$rtsp_mode" in
  record)
-  run_test 'com.rtspmonitor.media.RtspRecordingTest#h264Tcp,com.rtspmonitor.media.RtspRecordingTest#h265Tcp,com.rtspmonitor.media.RtspRecordingTest#twoRecordersRemainIndependentWhenOneStops,com.rtspmonitor.media.RtspRecordingTest#sourceChangesAreUnionedWithinOneSegment' recording.log -e rtspBase rtsp://10.0.2.2:18554 ;;
+  run_test 'com.rtspmonitor.media.RtspRecordingTest#h264Tcp,com.rtspmonitor.media.RtspRecordingTest#h265Tcp,com.rtspmonitor.media.RtspRecordingTest#twoRecordersRemainIndependentWhenOneStops,com.rtspmonitor.media.RtspRecordingTest#sourceChangesAreUnionedWithinOneSegment,com.rtspmonitor.media.RtspRecordingTest#segmentLimitCanShrinkAndGrowWithoutRestart' recording.log -e rtspBase rtsp://10.0.2.2:18554 ;;
  udp)
   run_test 'com.rtspmonitor.media.RtspRecordingTest#h264Udp,com.rtspmonitor.media.RtspRecordingTest#h265Udp' udp.log -e rtspBase rtsp://10.0.2.2:18554 ;;
  udp-forwarded|playback)

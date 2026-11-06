@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.rtspmonitor.core.Mp4StructureTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-06T03:17:48.931Z" hostname="xiejinzhongdeMac-mini.local" time="0.004">
+  <properties/>
+  <testcase name="noCompletedFragmentCannotBeRecovered" classname="com.rtspmonitor.core.Mp4StructureTest" time="0.002"/>
+  <testcase name="completeOrdinaryMp4HasNoRecoverableFragmentPrefix" classname="com.rtspmonitor.core.Mp4StructureTest" time="0.0"/>
+  <testcase name="incompleteMediaBoxKeepsPreviousFragment" classname="com.rtspmonitor.core.Mp4StructureTest" time="0.0"/>
+  <testcase name="oversizedExtendedBoxCannotOverflow" classname="com.rtspmonitor.core.Mp4StructureTest" time="0.001"/>
+  <testcase name="partialHeaderCannotBePublished" classname="com.rtspmonitor.core.Mp4StructureTest" time="0.0"/>
+  <testcase name="completeFragmentedFile" classname="com.rtspmonitor.core.Mp4StructureTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

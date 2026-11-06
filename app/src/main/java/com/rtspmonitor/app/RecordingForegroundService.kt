@@ -15,6 +15,7 @@ class RecordingForegroundService: Service() {
  private var detector:ActivityDetector?=null
  private val detecting=AtomicBoolean(false)
  private val policy=ActivityPolicy()
+ private var detectionSettings=MonitorSettings()
  private var wakeLock:PowerManager.WakeLock?=null
  private var loop:Job?=null
  private var retryAt=0L
@@ -75,8 +76,10 @@ class RecordingForegroundService: Service() {
       if(!detecting.compareAndSet(false,true)) bitmap.recycle()
       else scope.launch {
        try {
-        val result=withContext(Dispatchers.Default) { detector?.detect(bitmap,now) }
-        if(flag("auto") && result!=null) {
+        val settings=app.monitorSettings.state.value
+        val result=withContext(Dispatchers.Default) { detector?.detect(bitmap,now,settings) }
+        if(flag("auto") && result!=null && settings.sameDetection(app.monitorSettings.state.value)) {
+         if(!settings.sameDetection(detectionSettings)) { policy.resetEvidence();detectionSettings=settings }
          app.sessions.detectionStatus.value=if(result.first) "检测到人形" else if(result.second) "检测到画面变化" else "未检测到活动"
          val before=policy.active
          policy.sample(result.first,result.second,now)
@@ -97,8 +100,12 @@ class RecordingForegroundService: Service() {
      app.sessions.connect(camera);retryAt=now+minOf(30000L,1000L shl minOf(retry++,5))
     } else if(connection==ConnectionState.CONNECTED) { retry=0;retryAt=0 }
     if(!desiredLive && connection!=ConnectionState.DISCONNECTED) app.sessions.disconnect(id)
-    session.sources=(if(flag("manual")) SOURCE_MANUAL else 0) or (if(policy.active) SOURCE_ACTIVITY else 0)
     val desiredRecord=flag("manual") || policy.active
+    if(desiredRecord) {
+     session.sources=(if(flag("manual")) SOURCE_MANUAL else 0) or (if(policy.active) SOURCE_ACTIVITY else 0)
+     session.segmentSeconds=app.monitorSettings.state.value.segmentSeconds(flag("manual"))
+     session.recordingEngine?.setSegmentSeconds(session.segmentSeconds)
+    }
     if(desiredRecord && !attempted) { attempted=true;app.sessions.start(camera) }
     if(!desiredRecord) {
      if(session.job?.isCompleted==false) { app.sessions.stop(id);if(session.state.value.recordingState!=RecordingState.FAILED)notifyEvent("录像已保存到应用内，可在录像列表导出到相册") }
