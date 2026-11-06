@@ -31,6 +31,9 @@ class PlaybackLayoutTest {
    }
    return instrumentation.uiAutomation.rootInActiveWindow?.let { visit(it) }
   }
+  fun capture(name:String) {
+   android.os.ParcelFileDescriptor.AutoCloseInputStream(instrumentation.uiAutomation.executeShellCommand("screencap -p /data/local/tmp/playback-$name.png")).use { it.readBytes() }
+  }
   fun panel()=find { it.contentDescription?.toString()=="回放控制条" }
   fun video()=find { it.contentDescription?.toString()=="回放画面" }
   fun click(text:String) {
@@ -46,15 +49,18 @@ class PlaybackLayoutTest {
     val picture=android.graphics.Rect();val controls=android.graphics.Rect()
     checkNotNull(video()).getBoundsInScreen(picture);checkNotNull(panel()).getBoundsInScreen(controls)
     assertTrue("Portrait controls must not overlap the video",controls.top>=picture.bottom)
+    capture("portrait")
     scenario.onActivity { vm.player.pausePlayback();vm.player.speedPlayback(0.5f) }
+    withTimeout(3000) { while(vm.player.playback.value.playing)delay(100) }
     click("全屏")
     withTimeout(10000) { while(app.resources.configuration.orientation!=android.content.res.Configuration.ORIENTATION_LANDSCAPE)delay(100) }
     delay(3700);assertNotNull("Paused controls stay visible",panel())
     scenario.onActivity { vm.player.seekPlayback(0);vm.player.resumePlayback() }
-    delay(3800);assertNull("Playing fullscreen controls auto-hide",panel())
+    withTimeout(5000) { while(!vm.player.playback.value.playing)delay(100) }
+    delay(3800);assertNull("Playing fullscreen controls auto-hide",panel());capture("fullscreen-hidden")
     assertTrue(checkNotNull(video()).performAction(AccessibilityNodeInfo.ACTION_CLICK))
     withTimeout(3000) { while(panel()==null)delay(100) }
-    click("暂停");delay(3700);assertNotNull(panel())
+    click("暂停");delay(3700);assertNotNull(panel());capture("fullscreen-paused")
     scenario.onActivity { vm.player.seekPlayback(0);vm.player.resumePlayback() }
     click("0.5×");delay(3700);assertNotNull("Open menu holds controls",panel())
     click("1.5×")

@@ -54,6 +54,9 @@ jobs:
           disable-animations: true
           script: |
             bash gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.app.SingleCameraConfigTest,com.rtspmonitor.app.DetectionTest,com.rtspmonitor.app.MonitorSettingsTest,com.rtspmonitor.app.PlaybackLayoutTest,com.rtspmonitor.app.PlaybackIsolationTest
+            adb pull /data/local/tmp/playback-portrait.png app/build/reports/playback-portrait.png
+            adb pull /data/local/tmp/playback-fullscreen-hidden.png app/build/reports/playback-fullscreen-hidden.png
+            adb pull /data/local/tmp/playback-fullscreen-paused.png app/build/reports/playback-fullscreen-paused.png
             bash gradlew :data:connectedDebugAndroidTest
             bash gradlew :media:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.media.FixtureTest,com.rtspmonitor.media.MediaStoreVideoTest#h264PublishAndDelete,com.rtspmonitor.media.MediaStoreVideoTest#h265PublishAndDelete -Pandroid.testInstrumentationRunnerArguments.generateFixtures=true -Pandroid.testInstrumentationRunnerArguments.useFixtures=true
             adb install -r app/build/outputs/apk/debug/app-debug.apk
