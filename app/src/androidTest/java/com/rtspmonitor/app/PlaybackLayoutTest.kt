@@ -20,7 +20,7 @@ class PlaybackLayoutTest {
   val id=UUID.randomUUID().toString()
   val camera=Camera(id,"Layout fixture","not-used")
   val input=File(app.store.temporary,"$id.mp4")
-  instrumentation.context.assets.open("h264.mp4").use { src -> input.outputStream().use { src.copyTo(it) } }
+  instrumentation.context.assets.open("playback-controls.mp4").use { src -> input.outputStream().use { src.copyTo(it) } }
   app.database.dao().save(camera);app.store.publish(input,camera)
   val row=app.database.dao().recordings().first().single { it.cameraId==id }
   fun find(test:(AccessibilityNodeInfo)->Boolean):AccessibilityNodeInfo? {
@@ -57,7 +57,7 @@ class PlaybackLayoutTest {
     delay(3700);assertNotNull("Paused controls stay visible",panel())
     scenario.onActivity { vm.player.seekPlayback(0);vm.player.resumePlayback() }
     withTimeout(5000) { while(!vm.player.playback.value.playing)delay(100) }
-    delay(3800);assertNull("Playing fullscreen controls auto-hide",panel());capture("fullscreen-hidden")
+    delay(3800);assertNull("Playing fullscreen controls auto-hide: ${vm.player.playback.value}",panel());capture("fullscreen-hidden")
     assertTrue(checkNotNull(video()).performAction(AccessibilityNodeInfo.ACTION_CLICK))
     withTimeout(3000) { while(panel()==null)delay(100) }
     click("暂停");delay(3700);assertNotNull(panel());capture("fullscreen-paused")
