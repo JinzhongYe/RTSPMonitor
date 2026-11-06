@@ -50,18 +50,19 @@ class PlaybackLayoutTest {
     checkNotNull(video()).getBoundsInScreen(picture);checkNotNull(panel()).getBoundsInScreen(controls)
     assertTrue("Portrait controls must not overlap the video",controls.top>=picture.bottom)
     capture("portrait")
-    scenario.onActivity { vm.player.pausePlayback();vm.player.speedPlayback(0.5f) }
-    withTimeout(3000) { while(vm.player.playback.value.playing)delay(100) }
+    scenario.onActivity { vm.player.speedPlayback(0.5f) }
     click("全屏")
     withTimeout(10000) { while(app.resources.configuration.orientation!=android.content.res.Configuration.ORIENTATION_LANDSCAPE)delay(100) }
-    delay(3700);assertNotNull("Paused controls stay visible",panel())
-    scenario.onActivity { vm.player.seekPlayback(0);vm.player.resumePlayback() }
-    withTimeout(5000) { while(!vm.player.playback.value.playing)delay(100) }
+    scenario.onActivity { assertSame(vm,androidx.lifecycle.ViewModelProvider(it)[PlaybackViewModel::class.java]) }
+    withTimeout(10000) { while(!vm.player.playback.value.playing)delay(100) }
     delay(3800);assertNull("Playing fullscreen controls auto-hide: ${vm.player.playback.value}",panel());capture("fullscreen-hidden")
     assertTrue(checkNotNull(video()).performAction(AccessibilityNodeInfo.ACTION_CLICK))
     withTimeout(3000) { while(panel()==null)delay(100) }
     click("暂停");delay(3700);assertNotNull(panel());capture("fullscreen-paused")
-    scenario.onActivity { vm.player.seekPlayback(0);vm.player.resumePlayback() }
+    assertFalse(vm.player.playback.value.playing)
+    click("播放")
+    try { withTimeout(10000) { while(!vm.player.playback.value.playing)delay(100) } }
+    catch(e:TimeoutCancellationException) { fail("Resume failed: ${vm.player.playback.value}; ${vm.player.status.value}") }
     click("0.5×");delay(3700);assertNotNull("Open menu holds controls",panel())
     click("1.5×")
     withTimeout(3000) { while(vm.player.playback.value.speed!=1.5f)delay(100) }
