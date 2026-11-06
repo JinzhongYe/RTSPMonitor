@@ -16,6 +16,10 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.style.TextOverflow
@@ -103,7 +107,7 @@ private fun time(ms:Long):String = java.lang.String.format(java.util.Locale.ROOT
     }
    }
   }
-  PlayerPanel(vm,full,Modifier.then(if(full)Modifier.weight(1f) else Modifier.fillMaxWidth().aspectRatio(16f/9f)),::toggleFull)
+  PlayerPanel(vm,full,Modifier.then(if(full)Modifier.weight(1f) else Modifier.fillMaxWidth()),::toggleFull)
   if(!full) {
    current?.let { Text("正在播放 · ${it.recordedTime()} · ${if(it.sourceMask==3) "手动＋活动" else recordingSourceLabel(it.sourceMask)}",modifier=Modifier.padding(horizontal=16.dp,vertical=6.dp),style=MaterialTheme.typography.labelMedium) }
    Row(Modifier.fillMaxWidth().padding(horizontal=12.dp),verticalAlignment=Alignment.CenterVertically) {
@@ -137,24 +141,56 @@ private fun time(ms:Long):String = java.lang.String.format(java.util.Locale.ROOT
 @Composable private fun PlayerPanel(vm:PlaybackViewModel,full:Boolean,modifier:Modifier,onFull:()->Unit) {
  val state by vm.player.playback.collectAsState()
  var dragging by remember(vm.uri) { mutableStateOf<Float?>(null) }
- var speeds by remember { mutableStateOf(false) }
- Box(modifier.background(Color.Black)) {
-  AndroidView(factory={createVideoView(it,vm.player)},modifier=Modifier.fillMaxSize(),onRelease={vm.player.detach(it)})
-  if(vm.uri==null) Text("选择下方录像开始回放",Modifier.align(Alignment.Center),color=Color.White)
-  Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(Color.Black.copy(alpha=0.65f))) {
-   Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween) {
-    TextButton(onClick={if(state.playing)vm.player.pausePlayback() else vm.player.resumePlayback()},enabled=vm.uri!=null) { Text(if(state.playing) "暂停" else "播放",color=Color.White) }
-    TextButton(onClick={vm.player.seekPlayback(state.positionMs-10000)},enabled=state.seekable) { Text("−10秒",color=Color.White) }
-    TextButton(onClick={vm.player.seekPlayback(state.positionMs+10000)},enabled=state.seekable) { Text("＋10秒",color=Color.White) }
-    Box { TextButton(onClick={speeds=true},enabled=vm.uri!=null) { Text("${state.speed}×",color=Color.White) }
-     DropdownMenu(expanded=speeds,onDismissRequest={speeds=false}) { listOf(0.5f,1f,1.5f,2f).forEach { rate -> DropdownMenuItem(text={Text("${rate}×")},onClick={vm.player.speedPlayback(rate);speeds=false}) } }
+ var speeds by remember(vm.uri,full) { mutableStateOf(false) }
+ var visible by remember(vm.uri,full) { mutableStateOf(true) }
+ var interaction by remember { mutableIntStateOf(0) }
+ val accessibility=LocalContext.current.getSystemService(android.content.Context.ACCESSIBILITY_SERVICE) as android.view.accessibility.AccessibilityManager
+ var exploring by remember { mutableStateOf(accessibility.isTouchExplorationEnabled) }
+ DisposableEffect(accessibility) {
+  val listener=android.view.accessibility.AccessibilityManager.TouchExplorationStateChangeListener { exploring=it }
+  accessibility.addTouchExplorationStateChangeListener(listener)
+  onDispose { accessibility.removeTouchExplorationStateChangeListener(listener) }
+ }
+ val keepVisible=!state.playing || dragging!=null || speeds || exploring || state.error!=null || vm.uri==null
+ LaunchedEffect(full,visible,keepVisible,interaction) {
+  if(keepVisible) visible=true
+  else if(full && visible) { delay(3000);visible=false }
+ }
+ val foreground=if(full)Color.White else MaterialTheme.colorScheme.onSurface
+ val controls: @Composable ()->Unit = {
+  Column(Modifier.fillMaxWidth().background(if(full)Color.Black.copy(alpha=0.65f) else MaterialTheme.colorScheme.surface).semantics { contentDescription="回放控制条" }) {
+   Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween) {
+    TextButton(onClick={interaction++;if(state.playing)vm.player.pausePlayback() else vm.player.resumePlayback()},enabled=vm.uri!=null,contentPadding=PaddingValues(horizontal=4.dp),modifier=Modifier.sizeIn(minWidth=48.dp,minHeight=48.dp)) { Text(if(state.playing) "暂停" else "播放",color=foreground,maxLines=1) }
+    TextButton(onClick={interaction++;vm.player.seekPlayback(state.positionMs-10000)},enabled=state.seekable,contentPadding=PaddingValues(horizontal=4.dp),modifier=Modifier.sizeIn(minWidth=48.dp,minHeight=48.dp)) { Text("−10秒",color=foreground,maxLines=1) }
+    TextButton(onClick={interaction++;vm.player.seekPlayback(state.positionMs+10000)},enabled=state.seekable,contentPadding=PaddingValues(horizontal=4.dp),modifier=Modifier.sizeIn(minWidth=48.dp,minHeight=48.dp)) { Text("＋10秒",color=foreground,maxLines=1) }
+    Box { TextButton(onClick={interaction++;speeds=true},enabled=vm.uri!=null,contentPadding=PaddingValues(horizontal=4.dp),modifier=Modifier.sizeIn(minWidth=48.dp,minHeight=48.dp)) { Text("${state.speed}×",color=foreground,maxLines=1) }
+     DropdownMenu(expanded=speeds,onDismissRequest={speeds=false;interaction++}) { listOf(0.5f,1f,1.5f,2f).forEach { rate -> DropdownMenuItem(text={Text("${rate}×")},onClick={vm.player.speedPlayback(rate);speeds=false;interaction++}) } }
     }
-    TextButton(onClick=onFull) { Text(if(full) "退出全屏" else "全屏",color=Color.White) }
+    TextButton(onClick={interaction++;onFull()},contentPadding=PaddingValues(horizontal=4.dp),modifier=Modifier.sizeIn(minWidth=48.dp,minHeight=48.dp)) { Text(if(full) "退出全屏" else "全屏",color=foreground,maxLines=1) }
    }
-   Text("${time(dragging?.toLong() ?: state.positionMs)} / ${time(state.durationMs)}",Modifier.padding(horizontal=16.dp),style=MaterialTheme.typography.labelSmall,color=Color.White)
-   Slider(value=(dragging ?: state.positionMs.toFloat()).coerceIn(0f,state.durationMs.coerceAtLeast(1).toFloat()),onValueChange={dragging=it},onValueChangeFinished={dragging?.let { vm.player.seekPlayback(it.toLong()) };dragging=null},valueRange=0f..state.durationMs.coerceAtLeast(1).toFloat(),enabled=state.seekable && state.durationMs>0,thumb={ Box(Modifier.size(14.dp).background(Color.White,androidx.compose.foundation.shape.CircleShape)) },track={ SliderDefaults.Track(sliderState=it,modifier=Modifier.height(3.dp)) },modifier=Modifier.fillMaxWidth().padding(horizontal=12.dp))
+   val timeline: @Composable (Modifier)->Unit = { sliderModifier ->
+    Slider(value=(dragging ?: state.positionMs.toFloat()).coerceIn(0f,state.durationMs.coerceAtLeast(1).toFloat()),onValueChange={dragging=it;interaction++},onValueChangeFinished={dragging?.let { vm.player.seekPlayback(it.toLong()) };dragging=null;interaction++},valueRange=0f..state.durationMs.coerceAtLeast(1).toFloat(),enabled=state.seekable && state.durationMs>0,thumb={ Box(Modifier.size(14.dp).background(if(full)Color.White else MaterialTheme.colorScheme.primary,androidx.compose.foundation.shape.CircleShape)) },track={ SliderDefaults.Track(sliderState=it,modifier=Modifier.height(3.dp)) },modifier=sliderModifier.heightIn(min=48.dp))
+   }
+   BoxWithConstraints(Modifier.fillMaxWidth().padding(horizontal=12.dp)) {
+    val elapsed="${time(dragging?.toLong() ?: state.positionMs)} / ${time(state.durationMs)}"
+    if(maxWidth<300.dp || LocalDensity.current.fontScale>1.3f) Column {
+     Text(elapsed,style=MaterialTheme.typography.labelSmall,color=foreground,maxLines=1)
+     timeline(Modifier.fillMaxWidth())
+    } else Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+     Text(elapsed,style=MaterialTheme.typography.labelSmall,color=foreground,maxLines=1)
+     timeline(Modifier.weight(1f))
+    }
+   }
   }
-  state.error?.let { Text(it,Modifier.align(Alignment.TopCenter).background(Color.Black.copy(alpha=0.7f)).padding(12.dp),color=Color.White) }
+ }
+ Column(modifier) {
+  Box(Modifier.then(if(full)Modifier.weight(1f) else Modifier.fillMaxWidth().aspectRatio(16f/9f)).background(Color.Black).semantics { contentDescription="回放画面" }.then(if(full)Modifier.clickable { interaction++;visible=if(keepVisible)true else !visible } else Modifier)) {
+   AndroidView(factory={createVideoView(it,vm.player)},modifier=Modifier.fillMaxSize(),onRelease={vm.player.detach(it)})
+   if(vm.uri==null) Text("选择下方录像开始回放",Modifier.align(Alignment.Center),color=Color.White)
+   if(full && visible)Box(Modifier.align(Alignment.BottomCenter)) { controls() }
+   state.error?.let { Text(it,Modifier.align(Alignment.TopCenter).background(Color.Black.copy(alpha=0.7f)).padding(12.dp),color=Color.White) }
+  }
+  if(!full)controls()
  }
 }
 @Composable private fun Thumbnail(row:Recording,vm:PlaybackViewModel,modifier:Modifier) {

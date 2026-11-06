@@ -53,7 +53,7 @@ jobs:
           emulator-boot-timeout: 300
           disable-animations: true
           script: |
-            bash gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.app.SingleCameraConfigTest,com.rtspmonitor.app.DetectionTest,com.rtspmonitor.app.MonitorSettingsTest
+            bash gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.app.SingleCameraConfigTest,com.rtspmonitor.app.DetectionTest,com.rtspmonitor.app.MonitorSettingsTest,com.rtspmonitor.app.PlaybackLayoutTest,com.rtspmonitor.app.PlaybackIsolationTest
             bash gradlew :data:connectedDebugAndroidTest
             bash gradlew :media:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.rtspmonitor.media.FixtureTest,com.rtspmonitor.media.MediaStoreVideoTest#h264PublishAndDelete,com.rtspmonitor.media.MediaStoreVideoTest#h265PublishAndDelete -Pandroid.testInstrumentationRunnerArguments.generateFixtures=true -Pandroid.testInstrumentationRunnerArguments.useFixtures=true
             adb install -r app/build/outputs/apk/debug/app-debug.apk
@@ -65,12 +65,12 @@ jobs:
       - name: Package
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/RTSPMonitor-0.8.0-debug.apk
+          cp app/build/outputs/apk/debug/app-debug.apk dist/RTSPMonitor-0.8.1-debug.apk
           "$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --print-certs dist/*.apk > dist/apk-signature.txt
           cd dist && sha256sum *.apk > SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: RTSPMonitor-0.8.0
+          name: RTSPMonitor-0.8.1
           path: dist/
       - uses: actions/upload-artifact@v4
         if: always()
